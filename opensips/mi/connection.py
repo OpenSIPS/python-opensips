@@ -30,7 +30,7 @@ import os
 import time
 import errno
 
-class Connector(ABC):
+class Connection(ABC):
     @abstractmethod
     def __init__(self, **kwargs):
         pass
@@ -43,7 +43,7 @@ class Connector(ABC):
     def valid(self):
         pass
 
-class Datagram(Connector):
+class Datagram(Connection):
     def __init__(self, **kwargs):
         if "ip" not in kwargs:
             raise ValueError("ip is required for Datagram connector")
@@ -70,7 +70,7 @@ class Datagram(Connector):
     def valid(self):
         return (True, None)
     
-class HTTP(Connector):
+class HTTP(Connection):
     def __init__(self, **kwargs):
         if "url" not in kwargs:
             raise ValueError("url is required for HTTP connector")
@@ -109,7 +109,7 @@ class HTTP(Connector):
             msg = "Could not connect to {} ({})".format(self.url, e)
             return (False, [msg, "Is OpenSIPS running?"])
     
-class FIFO(Connector):
+class FIFO(Connection):
     REPLY_FIFO_FILE_TEMPLATE = "opensips_fifo_reply_{}_{}"\
     
     def __init__(self, **kwargs):
