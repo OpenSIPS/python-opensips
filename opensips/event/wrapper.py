@@ -35,9 +35,9 @@ class Event():
         self.type.create()
         self.cb = None
 
-    def subscribe(self, event: str, callback, expire: int = 0):
+    def subscribe(self, event: str, callback, expire=3600):
         # callback should be a function that takes a socket as an argument
-        self.mi.execute("event_subscribe", [event, self.type.sock_name, expire])
+        print(self.mi.execute("event_subscribe", [event, self.type.sock_name, expire]))
         self.cb = callback
 
     def get_socket(self):
