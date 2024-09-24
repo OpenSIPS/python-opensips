@@ -17,7 +17,7 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from .connector import HTTP, Datagram, FIFO
+from .connection import HTTP, Datagram, FIFO
 from .jsonrpc_helper import JSONRPCError, JSONRPCException
 
 class MI():
