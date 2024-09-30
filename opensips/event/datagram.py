@@ -17,17 +17,8 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from abc import ABC, abstractmethod
 import socket
-
-class GenericSocket(ABC):
-    @abstractmethod
-    def __init__(self, **kwargs):
-        pass
-
-    @abstractmethod
-    def create(self):
-        pass
+from .generic import GenericSocket
 
 class Datagram(GenericSocket):
     def __init__(self, **kwargs):
@@ -51,18 +42,8 @@ class Datagram(GenericSocket):
             self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
             self.sock.bind(self.sock_name)
 
-class Stream(GenericSocket):
-    def __init__(self, **kwargs):
-        if "ip" not in kwargs:
-            raise ValueError("ip is required for Stream connector")
-        if "port" not in kwargs:
-            raise ValueError("port is required for Stream connector")
-        
-        self.ip = kwargs["ip"]
-        self.port = kwargs["port"]
-        self.sock_name = f"tcp:{self.ip}:{self.port}"
+    def handle(self, callback, stop):
+        while not stop:
+            data = self.sock.recv(1024)
+            callback(data)
 
-    def create(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind((self.ip, self.port))
-        self.sock.listen(1)

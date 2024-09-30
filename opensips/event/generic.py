@@ -17,4 +17,17 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from .subscriber import EventInterface
+from abc import ABC, abstractmethod
+
+class GenericSocket(ABC):
+    @abstractmethod
+    def __init__(self, **kwargs):
+        pass
+
+    @abstractmethod
+    def create(self):
+        pass
+
+    @abstractmethod
+    def handle(self, callback, stop):
+        pass

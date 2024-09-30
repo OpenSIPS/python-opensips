@@ -18,30 +18,38 @@
 ##
 
 from ..mi import MI
-from .socket import Datagram, Stream
+from .datagram import Datagram
+from .stream import Stream
+from threading import Thread
 
-class Event():
+class EventInterface():
     def __init__(self, mi: MI, type: str, **kwargs):
         self.mi = mi
         self.kwargs = kwargs
 
         if type == "datagram":
-            self.type = Datagram(**kwargs)
+            self.socket = Datagram(**kwargs)
         elif type == "stream":
-            self.type = Stream(**kwargs)
+            self.socket = Stream(**kwargs)
         else:
             raise ValueError("Invalid event type")
 
-        self.type.create()
-        self.cb = None
-
     def subscribe(self, event: str, callback, expire=3600):
-        # callback should be a function that takes a socket as an argument
-        print(self.mi.execute("event_subscribe", [event, self.type.sock_name, expire]))
-        self.cb = callback
+        try:
+            ret_val = self.mi.execute("event_subscribe", [event, self.socket.sock_name, expire])
+            print(ret_val)
 
-    def get_socket(self):
-        return self.type.sock
+            if ret_val != "OK":
+                raise Exception("Failed to subscribe to event")
+            
+            self.socket.create()
+            self.thread_stop = False
+            self.thread = Thread(target=self.socket.handle, args=(callback, self.thread_stop))
+            self.thread.start()
 
-    def callback(self):
-        return self.cb(self.type.sock)
+        except Exception as e:
+            raise e
+        
+    def stop(self):
+        self.thread_stop = True
+        self.thread.join()
