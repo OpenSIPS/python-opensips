@@ -20,7 +20,7 @@
 from ..mi import MI
 from .datagram import Datagram
 from .stream import Stream
-from threading import Thread
+from threading import Thread, Event
 
 class EventInterface():
     def __init__(self, mi: MI, type: str, **kwargs):
@@ -43,7 +43,8 @@ class EventInterface():
                 raise Exception("Failed to subscribe to event")
             
             self.socket.create()
-            self.thread_stop = False
+            self.thread_stop = Event()
+            self.thread_stop.clear()
             self.thread = Thread(target=self.socket.handle, args=(callback, self.thread_stop))
             self.thread.start()
 
@@ -51,5 +52,5 @@ class EventInterface():
             raise e
         
     def stop(self):
-        self.thread_stop = True
+        self.thread_stop.set()
         self.thread.join()

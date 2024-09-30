@@ -41,9 +41,12 @@ class Datagram(GenericSocket):
         else:
             self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
             self.sock.bind(self.sock_name)
+        self.sock.setblocking(False)
 
     def handle(self, callback, stop):
-        while not stop:
-            data = self.sock.recv(1024)
-            callback(data)
-
+        while not stop.is_set():
+            try:
+                data = self.sock.recv(1024)
+                callback(data)
+            except BlockingIOError:
+                pass
