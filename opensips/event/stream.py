@@ -34,5 +34,18 @@ class Stream(GenericSocket):
     def create(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind((self.ip, self.port))
+        self.sock.setblocking(False)
         self.sock.listen(1)
-        self.sock.accept()
+
+    def handle(self, callback, stop):
+        while not stop.is_set():
+            try:
+                conn, _ = self.sock.accept()
+                conn.setblocking(True)
+                with conn:
+                    data = conn.recv(1024)
+                    if not data:
+                        continue
+                    callback(data)
+            except BlockingIOError:
+                pass
