@@ -17,12 +17,15 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from ..mi import MI
+from ..mi import MI, OpenSIPSMIException
 from .datagram import Datagram
 from .stream import Stream
 from threading import Thread, Event
 
-class EventInterface():
+class OpenSIPSEventException(Exception):
+    pass
+
+class OpenSIPSEvent():
     def __init__(self, mi: MI, type: str, **kwargs):
         self.mi = mi
         self.kwargs = kwargs
@@ -34,13 +37,15 @@ class EventInterface():
         else:
             raise ValueError("Invalid event type")
 
-    def subscribe(self, event: str, callback, expire=3600):
+    def subscribe(self, event: str, callback, expire=None):
         try:
-            ret_val = self.mi.execute("event_subscribe", [event, self.socket.sock_name, expire])
-            print(ret_val)
+            if expire is None:
+                ret_val = self.mi.execute("event_subscribe", [event, self.socket.sock_name])
+            else:
+                ret_val = self.mi.execute("event_subscribe", [event, self.socket.sock_name, expire])
 
             if ret_val != "OK":
-                raise Exception("Failed to subscribe to event")
+                raise OpenSIPSEventException("Failed to subscribe to event")
             
             self.socket.create()
             self.thread_stop = Event()
@@ -48,7 +53,19 @@ class EventInterface():
             self.thread = Thread(target=self.socket.handle, args=(callback, self.thread_stop))
             self.thread.start()
 
+        except OpenSIPSMIException as e:
+            raise e
         except Exception as e:
+            raise OpenSIPSEventException("Failed to subscribe to event: {}".format(e))
+        
+    def unsubscribe(self, event: str):
+        try:
+            ret_val = self.mi.execute("event_subscribe", [event, self.socket.sock_name, 0])
+
+            if ret_val != "OK":
+                raise OpenSIPSEventException("Failed to unsubscribe from event")
+            
+        except OpenSIPSMIException as e:
             raise e
         
     def stop(self):
