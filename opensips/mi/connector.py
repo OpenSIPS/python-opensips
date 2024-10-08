@@ -20,6 +20,9 @@
 from .connection import HTTP, Datagram, FIFO
 from .jsonrpc_helper import JSONRPCError, JSONRPCException
 
+class OpenSIPSMIException(Exception):
+    pass
+
 class MI():
     def __init__(self, conn: str, **kwargs):
         if conn == "fifo":
@@ -37,9 +40,9 @@ class MI():
         try:
             ret_val = self.conn.execute(cmd, params)
         except JSONRPCError as e:
-            raise Exception("Error executing command: {}".format(e))
+            raise OpenSIPSMIException("Error executing command: {}".format(e))
         except JSONRPCException as e:
-            raise Exception("Error with connection: {}. Is OpenSIPS running?".format(e))
+            raise OpenSIPSMIException("Error with connection: {}. Is OpenSIPS running?".format(e))
         return ret_val
     
     def valid(self):
