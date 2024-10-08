@@ -7,7 +7,7 @@ setup(
     install_requires=[],
     author="Darius Stefan",
     author_email="darius.stefan@opensips.org",
-    description="OpenSIPS Python Package for MI and Event Interface",
+    description="OpenSIPS Python Packages",
     url="https://github.com/OpenSIPS/python-opensips",
     classifiers=[
         "Programming Language :: Python :: 3",
