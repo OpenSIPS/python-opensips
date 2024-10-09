@@ -33,4 +33,4 @@ By default, the subscription will be permanent. If you want to set a timeout, yo
 
 ## How it works
 
-When subscribing to an event, a new thread is created to listen for notifications. The thread will call the callback function provided when an event is received. When unsubscribing, the thread will be stopped and the socket will be closed if no exceptions occur.
+When subscribing to an event, a new thread is created to listen for notifications. The thread will call the callback function provided when an event is received. When unsubscribing, the thread will be stopped and the socket will be closed if no exceptions occur. You can also use `stop` method to stop the thread and close the socket manually.
