@@ -17,13 +17,15 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from .connection import HTTP, Datagram, FIFO
+from .fifo import FIFO
+from .datagram import Datagram
+from .http import HTTP
 from .jsonrpc_helper import JSONRPCError, JSONRPCException
 
 class OpenSIPSMIException(Exception):
     pass
 
-class MI():
+class OpenSIPSMI():
     def __init__(self, conn: str, **kwargs):
         if conn == "fifo":
             self.conn = FIFO(**kwargs)
