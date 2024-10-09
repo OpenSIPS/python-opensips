@@ -4,14 +4,14 @@ import socket
 
 class Datagram(Connection):
     def __init__(self, **kwargs):
-        if "ip" not in kwargs:
-            raise ValueError("ip is required for Datagram connector")
+        if "datagram_ip" not in kwargs:
+            raise ValueError("datagram_ip is required for Datagram connector")
         
-        if "port" not in kwargs:
-            raise ValueError("port is required for Datagram connector")
+        if "datagram_port" not in kwargs:
+            raise ValueError("datagram_port is required for Datagram connector")
         
-        self.ip = kwargs["ip"]
-        self.port = kwargs["port"]
+        self.ip = kwargs["datagram_ip"]
+        self.port = int(kwargs["datagram_port"])
 
     def execute(self, method: str, params: dict):
         jsoncmd = jsonrpc_helper.get_command(method, params)
