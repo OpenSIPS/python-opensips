@@ -31,3 +31,7 @@ class GenericSocket(ABC):
     @abstractmethod
     def handle(self, callback, stop):
         pass
+
+    @abstractmethod
+    def destroy(self):
+        pass

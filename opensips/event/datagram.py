@@ -18,7 +18,7 @@
 ##
 
 import socket
-from .generic import GenericSocket
+from .generic_socket import GenericSocket
 
 class Datagram(GenericSocket):
     def __init__(self, **kwargs):
@@ -50,3 +50,7 @@ class Datagram(GenericSocket):
                 callback(data)
             except BlockingIOError:
                 pass
+
+    def destroy(self):
+        self.sock.close()
+        self.sock = None

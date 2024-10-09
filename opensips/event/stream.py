@@ -18,7 +18,7 @@
 ##
 
 import socket
-from .generic import GenericSocket
+from .generic_socket import GenericSocket
 
 class Stream(GenericSocket):
     def __init__(self, **kwargs):
@@ -49,3 +49,7 @@ class Stream(GenericSocket):
                     callback(data)
             except BlockingIOError:
                 pass
+    
+    def destroy(self):
+        self.sock.close()
+        self.sock = None
