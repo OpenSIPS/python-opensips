@@ -29,7 +29,7 @@ class Datagram(GenericSocket):
             self.sock_name = kwargs["unix_path"]
         elif "ip" in kwargs and "port" in kwargs:
             self.ip = kwargs["ip"]
-            self.port = kwargs["port"]
+            self.port = int(kwargs["port"])
             self.sock_name = f"udp:{self.ip}:{self.port}"
         else:
             raise ValueError("ip and port or unix_path is required for Datagram connector")

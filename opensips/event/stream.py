@@ -28,7 +28,7 @@ class Stream(GenericSocket):
             raise ValueError("port is required for Stream connector")
         
         self.ip = kwargs["ip"]
-        self.port = kwargs["port"]
+        self.port = int(kwargs["port"])
         self.sock_name = f"tcp:{self.ip}:{self.port}"
 
     def create(self):
