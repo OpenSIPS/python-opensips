@@ -17,7 +17,7 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from ..mi import MI, OpenSIPSMIException
+from ..mi import OpenSIPSMI, OpenSIPSMIException
 from .datagram import Datagram
 from .stream import Stream
 from threading import Thread, Event
@@ -26,7 +26,7 @@ class OpenSIPSEventException(Exception):
     pass
 
 class OpenSIPSEvent():
-    def __init__(self, mi: MI, type: str, **kwargs):
+    def __init__(self, mi: OpenSIPSMI, type: str, **kwargs):
         self.mi = mi
         self.kwargs = kwargs
 
@@ -65,9 +65,12 @@ class OpenSIPSEvent():
             if ret_val != "OK":
                 raise OpenSIPSEventException("Failed to unsubscribe from event")
             
+            self.stop()
+
         except OpenSIPSMIException as e:
             raise e
-        
+
     def stop(self):
         self.thread_stop.set()
         self.thread.join()
+        self.socket.destroy()
