@@ -60,6 +60,25 @@ Currently, the following packages are available:
 * [MI](docs/mi.md) - contains information about supported MI communication types and required parameters for each type.
 * [Event Interface](docs/event.md) - lists the supported event transport protocols and provides information about the required parameters for each protocol.
 
+## Scripts
+
+After installing the package, you can use the provided [opensips-mi](scripts/opensips-mi) script to run MI commands. This script takes the following arguments:
+- `-t` or `--type` - the type of the MI communication ()`http` or `datagram`)
+- `-i` or `--ip` - the IP address of the OpenSIPS server.
+- `-p` or `--port` - the port of the OpenSIPS MI.
+
+#### Usage
+```bash
+# general usage
+opensips-mi -t datagram -p 8080 command_name [command_args ...]
+
+# this will execute get_statistics command
+opensips-mi -t datagram -p 8080 -s core: shmem:
+
+# you can pass json string as argument with -j flag for commands that require arrays as arguments
+opensips-mi -t datagram -p 8080 get_statistics -j "{'statistics': ['core:', 'shmem:']}"
+```
+
 ## License
 
 <!-- License source -->
