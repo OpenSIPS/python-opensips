@@ -15,11 +15,12 @@ class Datagram(Connection):
 
     def execute(self, method: str, params: dict):
         jsoncmd = jsonrpc_helper.get_command(method, params)
+
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             udp_socket.sendto(jsoncmd.encode(), (self.ip, self.port))
             udp_socket.settimeout(5.0)
-            reply = udp_socket.recv(1024)
+            reply = udp_socket.recv(32768)
         except Exception as e:
             raise jsonrpc_helper.JSONRPCException(e)
         finally:

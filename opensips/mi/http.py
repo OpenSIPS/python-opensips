@@ -26,7 +26,7 @@ class HTTP(Connection):
                 reply = urllib.request.urlopen(request, context=ssl._create_unverified_context()).read().decode()
             else:
                 reply = urllib.request.urlopen(request).read().decode()
-        except urllib.error.HTTPError as e:
+        except Exception as e:
             raise jsonrpc_helper.JSONRPCException(str(e))
         return jsonrpc_helper.get_reply(reply)
     
