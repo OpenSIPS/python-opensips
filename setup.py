@@ -14,5 +14,6 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    scripts=['scripts/opensips-mi'],
     python_requires=">=3.6"
 )
