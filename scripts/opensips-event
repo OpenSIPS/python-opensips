@@ -1,0 +1,124 @@
+#!/usr/bin/env python
+##
+## This file is part of the OpenSIPS Python Package
+## (see https://github.com/OpenSIPS/python-opensips).
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program. If not, see <http://www.gnu.org/licenses/>.
+##
+
+import argparse
+from opensips.mi import OpenSIPSMI, OpenSIPSMIException
+from opensips.event import OpenSIPSEvent, OpenSIPSEventException
+import json
+import signal
+
+parser = argparse.ArgumentParser()
+
+communication = parser.add_argument_group('communication')
+
+communication.add_argument('-t', '--type',
+                    type=str,
+                    choices=['fifo', 'http', 'datagram'],
+                    help='OpenSIPS MI Communication Type')
+communication.add_argument('-i', '--ip',
+                    type=str,
+                    help='OpenSIPS MI IP Address',
+                    default='127.0.0.1')
+communication.add_argument('-p', '--port',
+                    type=int,
+                    help='OpenSIPS MI Port',
+                    default=8888)
+communication.add_argument('-f', '--file',
+                    metavar='FIFO_FILE',
+                    type=str,
+                    help='OpenSIPS MI FIFO File')
+communication.add_argument('-fb', '--fallback',
+                    metavar='FIFO_FALLBACK_FILE',
+                    type=str,
+                    help='OpenSIPS MI Fallback FIFO File')
+communication.add_argument('-fd', '--dir',
+                    metavar='FIFO_DIR',
+                    type=str,
+                    help='OpenSIPS MI FIFO Reply Directory')
+
+event = parser.add_argument_group('event')
+
+event.add_argument('event',
+                    type=str,
+                    help='OpenSIPS Event Name')
+
+event.add_argument('-T', '--transport',
+                    type=str,
+                    choices=['datagram', 'stream'],
+                    help='OpenSIPS Event Transport',
+                    required=True)
+event.add_argument('-li', '--listen-ip',
+                    type=str,
+                    help='OpenSIPS Event Listen IP Address',
+                    default='127.0.0.1')
+event.add_argument('-lp', '--listen-port',
+                    type=int,
+                    help='OpenSIPS Event Listen Port',
+                    required=True)
+event.add_argument('-e', '--expire',
+                    type=int,
+                    help='OpenSIPS Event Expire Time',
+                    default=3600)
+
+arguments = parser.parse_args()
+
+print(arguments)
+
+if not arguments.type or arguments.type == 'fifo':
+    fifo_args = {}
+    if arguments.file:
+        fifo_args['file'] = arguments.file
+    if arguments.fallback:
+        fifo_args['fallback'] = arguments.fallback
+    if arguments.dir:
+        fifo_args['dir'] = arguments.dir
+    mi = OpenSIPSMI('fifo', **fifo_args)
+    
+if arguments.type == 'http':
+    mi = OpenSIPSMI('http', url='http://{}:{}/mi'.format(arguments.ip, arguments.port))
+
+if arguments.type == 'datagram':
+    mi = OpenSIPSMI('datagram', datagram_ip=arguments.ip, datagram_port=arguments.port)
+
+event = OpenSIPSEvent(mi, arguments.transport, ip=arguments.listen_ip, port=arguments.listen_port)
+
+def event_handler(message):
+    try:
+        message_json = json.loads(message.decode('utf-8'))
+        print(json.dumps(message_json, indent=4))
+    except json.JSONDecodeError as e:
+        print(f"Failed to decode JSON: {e}")
+
+def timer(*args):
+    event.unsubscribe(arguments.event)
+    exit(1)
+
+signal.signal(signal.SIGALRM, timer)
+signal.alarm(arguments.expire)
+
+try:
+    event.subscribe(arguments.event, event_handler, expire=arguments.expire)
+except OpenSIPSEventException as e:
+    print(e)
+
+try:
+    while True:
+        pass
+except KeyboardInterrupt:
+    event.unsubscribe(arguments.event)
