@@ -17,39 +17,46 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+""" Implements TCP/Stream Connection """
+
 import socket
 from .generic_socket import GenericSocket
 
 class Stream(GenericSocket):
+
+    """ TCP/Stream implementation of a socket """
+
     def __init__(self, **kwargs):
         if "ip" not in kwargs:
             raise ValueError("ip is required for Stream connector")
         if "port" not in kwargs:
             raise ValueError("port is required for Stream connector")
-        
+
         self.ip = kwargs["ip"]
         self.port = int(kwargs["port"])
-        self.sock_name = f"tcp:{self.ip}:{self.port}"
+        self.sock = None
+        self.sock_name = None
 
     def create(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind((self.ip, self.port))
-        self.sock.setblocking(False)
+        self.ip, self.port = self.sock.getsockname()
+        if self.ip == "0.0.0.0":
+            hostname = socket.gethostname()
+            self.ip = socket.gethostbyname(hostname)
+        self.sock_name = f"udp:{self.ip}:{self.port}"
+        self.sock.settimeout(0.1)
         self.sock.listen(1)
+        return self.sock_name
 
-    def handle(self, callback, stop):
-        while not stop.is_set():
-            try:
-                conn, _ = self.sock.accept()
-                conn.setblocking(True)
-                with conn:
-                    data = conn.recv(1024)
-                    if not data:
-                        continue
-                    callback(data)
-            except BlockingIOError:
-                pass
-    
+    def read(self):
+        try:
+            conn, _ = self.sock.accept()
+            with conn:
+                return conn.recv(65536)
+        except socket.timeout:
+            return None
+
     def destroy(self):
         self.sock.close()
         self.sock = None

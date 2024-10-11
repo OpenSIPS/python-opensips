@@ -17,18 +17,23 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+""" MI Datagram implementation """
+
+import socket
 from .connection import Connection
 from . import jsonrpc_helper
-import socket
 
 class Datagram(Connection):
+
+    """ MI Datagram connection """
+
     def __init__(self, **kwargs):
         if "datagram_ip" not in kwargs:
             raise ValueError("datagram_ip is required for Datagram connector")
-        
+
         if "datagram_port" not in kwargs:
             raise ValueError("datagram_port is required for Datagram connector")
-        
+
         self.ip = kwargs["datagram_ip"]
         self.port = int(kwargs["datagram_port"])
 
@@ -45,6 +50,6 @@ class Datagram(Connection):
         finally:
             udp_socket.close()
         return jsonrpc_helper.get_reply(reply)
-    
+
     def valid(self):
         return (True, None)

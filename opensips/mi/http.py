@@ -17,20 +17,24 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from .connection import Connection
-import urllib.error
-from . import jsonrpc_helper
-import socket
+""" HTTP implementation of MI """
 
-import urllib.request
-import urllib.parse
 import ssl
+import socket
+import urllib.error
+import urllib.parse
+import urllib.request
+from .connection import Connection
+from . import jsonrpc_helper
 
 class HTTP(Connection):
+
+    """ HTTP communication socket """
+
     def __init__(self, **kwargs):
         if "url" not in kwargs:
             raise ValueError("url is required for HTTP connector")
-        
+
         self.url = kwargs["url"]
 
     def execute(self, method: str, params: dict):
@@ -42,13 +46,15 @@ class HTTP(Connection):
         url_parsed = urllib.parse.urlparse(self.url)
         try:
             if url_parsed.scheme == "https":
-                reply = urllib.request.urlopen(request, context=ssl._create_unverified_context()).read().decode()
+                ssl_ctx = ssl._create_unverified_context()
             else:
-                reply = urllib.request.urlopen(request).read().decode()
+                ssl_ctx = None
+            with urllib.request.urlopen(request,context=ssl_ctx) as rpl:
+                reply = rpl.read().decode()
         except Exception as e:
             raise jsonrpc_helper.JSONRPCException(str(e))
         return jsonrpc_helper.get_reply(reply)
-    
+
     def valid(self):
         try:
             url_parsed = urllib.parse.urlparse(self.url)
@@ -62,5 +68,5 @@ class HTTP(Connection):
             sock.close()
             return (True, None)
         except Exception as e:
-            msg = "Could not connect to {} ({})".format(self.url, e)
+            msg = f"Could not connect to {self.url} ({e})"
             return (False, [msg, "Is OpenSIPS running?"])

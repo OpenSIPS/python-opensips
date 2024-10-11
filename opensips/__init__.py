@@ -17,5 +17,8 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from .version import __version__
+""" Main package of OpenSIPS """
 
+from .mi import OpenSIPSMI
+from .event import OpenSIPSEvent
+from .version import __version__

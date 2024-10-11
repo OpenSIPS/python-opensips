@@ -17,6 +17,10 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+"""
+This module contains helper functions to build and parse JSONRPC commands
+"""
+
 import json
 from random import randint
 from collections import OrderedDict
@@ -26,47 +30,49 @@ try:
 except ImportError: # JSONDecodeError is not available in  python3.4
     JSONDecodeError = ValueError
 
-"""
-This function contains helper functions to build and parse JSONRPC commands
-"""
-
 class JSONRPCException(Exception):
-    pass
+    """ JSONRPC generic exception """
 
 class JSONRPCError(JSONRPCException):
+
+    """ JSONRPC parsing exception """
 
     def __init__(self, code, message, data=None):
         self.code = code
         self.message = message
         self.data = data
 
-    def get_data(self):
+    def get_data(self) -> str:
+        """ Returns the data of the exception """
         return self.data
 
-    def __str__(self):
-        return '{}: {}{}'.format(self.code, self.message,
-                " ({})".format(self.data) if self.data else "")
+    def __str__(self) -> str:
+        data = f" ({self.data})" if self.data else ""
+        return f"{self.code}: {self.message}{data}"
 
-def get_command(method, params={}):
+def get_command(method, params=None) -> str:
+
+    """ Builds a JSONRPC command and returns it """
+
     cmd = {
             'jsonrpc': '2.0',
             'id': str(randint(0, 32767)),
             'method': method,
-            'params': params
+            'params': params if params else {}
     }
     return json.dumps(cmd)
 
-def get_reply(cmd):
+def get_reply(cmd) -> OrderedDict:
+
+    """ Parses the reply and returns it as a OrderedDict """
     try:
         j = json.loads(cmd, object_pairs_hook=OrderedDict)
         if isinstance(j.get('error'), dict):
             raise JSONRPCError(j['error'].get('code', 500),
                                j['error'].get('message'),
                                j['error'].get('data'))
-
-        elif 'result' not in j:
+        if 'result' not in j:
             raise JSONRPCError(-32603, 'Internal error')
-        else:
-            return j['result']
-    except JSONDecodeError:
-        raise JSONRPCException("could not decode json: '{}'".format(cmd))
+        return j['result']
+    except JSONDecodeError as exc:
+        raise JSONRPCException(f"could not decode json: '{cmd}'") from exc

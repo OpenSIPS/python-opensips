@@ -17,15 +17,18 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+""" Connector implementation for OpenSIPS MI """
+
 from .fifo import FIFO
 from .datagram import Datagram
 from .http import HTTP
 from .jsonrpc_helper import JSONRPCError, JSONRPCException
 
 class OpenSIPSMIException(Exception):
-    pass
+    """ Generic OpenSIPS MI Exception """
 
 class OpenSIPSMI():
+    """ OpenSIPS MI Implementation """
     def __init__(self, conn="fifo", **kwargs):
         if conn == "fifo":
             if "fifo_file" not in kwargs:
@@ -43,17 +46,19 @@ class OpenSIPSMI():
             raise ValueError("Invalid connector type")
 
         self.validated = None
-    
-    def execute(self, cmd, params=[]):
+
+    def execute(self, cmd, params=None):
+        """ Executes a command with the requested parameters """
         try:
-            ret_val = self.conn.execute(cmd, params)
+            ret_val = self.conn.execute(cmd, params if params else [])
         except JSONRPCError as e:
-            raise OpenSIPSMIException("Error executing command: {}".format(e))
+            raise OpenSIPSMIException(f"Error executing command: {e}") from e
         except JSONRPCException as e:
-            raise OpenSIPSMIException("Error with connection: {}. Is OpenSIPS running?".format(e))
+            raise OpenSIPSMIException(f"Error with connection: {e}. Is OpenSIPS running?") from e
         return ret_val
-    
+
     def valid(self):
+        """ Checks if the connector is valid """
         if self.validated is not None:
             return self.validated
         self.validated = self.conn.valid()

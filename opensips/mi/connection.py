@@ -17,17 +17,23 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+
+""" Abstract implementation of an MI connection """
+
 from abc import ABC, abstractmethod
 
 class Connection(ABC):
+
+    """ Abstract MI Connection """
+
     @abstractmethod
     def __init__(self, **kwargs):
         pass
 
     @abstractmethod
     def execute(self, method: str, params: dict):
-        pass
+        """ Executes an MI Command """
 
     @abstractmethod
     def valid(self):
-        pass
+        """ Checks if an MI connection is valid """

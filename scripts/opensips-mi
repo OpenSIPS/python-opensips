@@ -92,14 +92,14 @@ else:
             print('Invalid JSON: ', e)
             exit(1)
 
-if not args.type or args.type == 'fifo':
+if args.type == 'fifo':
     fifo_args = {}
-    if args.file:
-        fifo_args['file'] = args.file
-    if args.fallback:
-        fifo_args['fallback'] = args.fallback
-    if args.dir:
-        fifo_args['dir'] = args.dir
+    if args.fifo_file:
+        fifo_args['fifo_file'] = args.fifo_file
+    if args.fifo_fallback:
+        fifo_args['fifo_file_fallback'] = args.fifo_fallback
+    if args.fifo_reply_dir:
+        fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
     mi = OpenSIPSMI('fifo', **fifo_args)
     
 if args.type == 'http':

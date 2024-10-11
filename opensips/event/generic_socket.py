@@ -17,21 +17,26 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+""" Defines a generic socket """
+
 from abc import ABC, abstractmethod
 
 class GenericSocket(ABC):
+
+    """ Abstract class for a socket generic implementation """
+
     @abstractmethod
     def __init__(self, **kwargs):
         pass
 
     @abstractmethod
-    def create(self):
-        pass
+    def create(self) -> str:
+        """ Creates a socket """
 
     @abstractmethod
-    def handle(self, callback, stop):
-        pass
+    def read(self):
+        """ Reads data on the socket """
 
     @abstractmethod
     def destroy(self):
-        pass
+        """ Destroys the socket """
