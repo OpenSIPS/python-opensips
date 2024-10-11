@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 ##
-## This file is part of the OpenSIPS Python Package
-## (see https://github.com/OpenSIPS/python-opensips).
+## This file is part of OpenSIPS CLI
+## (see https://github.com/OpenSIPS/opensips-cli).
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -17,5 +17,4 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-from .version import __version__
-
+__version__ = '0.1.0'

@@ -1,8 +1,10 @@
 from setuptools import setup, find_packages
 
+from opensips import version
+
 setup(
     name="opensips",
-    version="0.1.0",
+    version=version.__version__,
     packages=find_packages(),
     install_requires=[],
     author="Darius Stefan",
