@@ -10,6 +10,8 @@ setup(
     author="Darius Stefan",
     author_email="darius.stefan@opensips.org",
     description="OpenSIPS Python Packages",
+    long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     url="https://github.com/OpenSIPS/python-opensips",
     classifiers=[
         "Programming Language :: Python :: 3",
