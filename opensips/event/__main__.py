@@ -17,12 +17,15 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
-import argparse
-from opensips.mi import OpenSIPSMI, OpenSIPSMIException
-from opensips.event import OpenSIPSEvent, OpenSIPSEventException
+""" OpenSIPS Event script """
+
+import sys
 import json
 import time
 import signal
+import argparse
+from opensips.mi import OpenSIPSMI
+from opensips.event import OpenSIPSEvent, OpenSIPSEventException
 
 parser = argparse.ArgumentParser()
 
@@ -78,51 +81,58 @@ event.add_argument('-e', '--expire',
                     help='OpenSIPS Event Expire Time',
                     default=None)
 
-args = parser.parse_args()
+def main():
+    """ Main function of the opensips-event script """
 
-if args.type == 'fifo':
-    fifo_args = {}
-    if args.fifo_file:
-        fifo_args['fifo_file'] = args.fifo_file
-    if args.fifo_fallback:
-        fifo_args['fifo_file_fallback'] = args.fifo_fallback
-    if args.fifo_reply_dir:
-        fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
-    mi = OpenSIPSMI('fifo', **fifo_args)
-elif args.type == 'http':
-    mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
-elif args.type == 'datagram':
-    mi = OpenSIPSMI('datagram', datagram_ip=args.ip, datagram_port=args.port)
-else:
-    print(f'Unknownt type: {args.type}')
-    sys.exit(1)
+    args = parser.parse_args()
 
-event = OpenSIPSEvent(mi, args.transport, ip=args.listen_ip, port=args.listen_port)
+    if args.type == 'fifo':
+        fifo_args = {}
+        if args.fifo_file:
+            fifo_args['fifo_file'] = args.fifo_file
+        if args.fifo_fallback:
+            fifo_args['fifo_file_fallback'] = args.fifo_fallback
+        if args.fifo_reply_dir:
+            fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
+        mi = OpenSIPSMI('fifo', **fifo_args)
+    elif args.type == 'http':
+        mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
+    elif args.type == 'datagram':
+        mi = OpenSIPSMI('datagram', datagram_ip=args.ip, datagram_port=args.port)
+    else:
+        print(f'Unknownt type: {args.type}')
+        sys.exit(1)
 
-def event_handler(message):
+    ev = OpenSIPSEvent(mi, args.transport, ip=args.listen_ip, port=args.listen_port)
+
+    def event_handler(message):
+        """ Event handler callback """
+        try:
+            message_json = json.loads(message.decode('utf-8'))
+            print(json.dumps(message_json, indent=4))
+        except json.JSONDecodeError as e:
+            print(f"Failed to decode JSON: {e}")
+
+    def timer(*_):
+        """ Timer to notify when the event expires """
+        ev.unsubscribe(args.event)
+        sys.exit(0) # successful
+
+    if args.expire:
+        signal.signal(signal.SIGALRM, timer)
+        signal.alarm(args.expire)
+
+    signal.signal(signal.SIGINT, timer)
+    signal.signal(signal.SIGTERM, timer)
+
     try:
-        message_json = json.loads(message.decode('utf-8'))
-        print(json.dumps(message_json, indent=4))
-    except json.JSONDecodeError as e:
-        print(f"Failed to decode JSON: {e}")
+        ev.subscribe(args.event, event_handler, expire=args.expire)
+    except OpenSIPSEventException as e:
+        print(e)
+        sys.exit(1)
 
-def timer(*_):
-    """ Timer to notify when the event expires """
-    event.unsubscribe(args.event)
-    sys.exit(0) # successful
+    while True:
+        time.sleep(1)
 
-if args.expire:
-    signal.signal(signal.SIGALRM, timer)
-    signal.alarm(args.expire)
-
-signal.signal(signal.SIGINT, timer)
-signal.signal(signal.SIGTERM, timer)
-
-try:
-    event.subscribe(args.event, event_handler, expire=args.expire)
-except OpenSIPSEventException as e:
-    print(e)
-    sys.exit(1)
-
-while True:
-    time.sleep(1)
+if __name__ == "__main__":
+    main()

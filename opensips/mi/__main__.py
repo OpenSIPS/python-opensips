@@ -17,9 +17,12 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+""" Script to run OpenSIPS MI commands """
+
+import sys
+import json
 import argparse
 from opensips.mi import OpenSIPSMI, OpenSIPSMIException
-import json
 
 parser = argparse.ArgumentParser()
 
@@ -27,6 +30,8 @@ communication = parser.add_argument_group('communication')
 
 communication.add_argument('-t', '--type',
                     type=str,
+                    default='fifo',
+                    choices=['fifo', 'http', 'datagram'],
                     help='OpenSIPS MI Communication Type')
 communication.add_argument('-i', '--ip',
                     type=str,
@@ -70,47 +75,52 @@ group.add_argument('parameters',
                     default=[],
                     help='cmd args')
 
-args = parser.parse_args()
-print(args)
+def main():
+    """ Main function of the opensips-mi script """
+    args = parser.parse_args()
 
-if args.stats:
-    print('Using get_statistics! Be careful not to use command after -s/--stats.')
-    print(args.stats)
-    args.command = 'get_statistics'
+    if args.stats:
+        print('Using get_statistics! Be careful not to use command after -s/--stats.')
+        print(args.stats)
+        args.command = 'get_statistics'
 
-    if args.json:
-        print('Cannot use -s/--stats with -j/--json!')
-        exit(1)
+        if args.json:
+            print('Cannot use -s/--stats with -j/--json!')
+            sys.exit(1)
 
-    args.parameters = {'statistics': args.stats}
-else:
-    if args.json:
-        try:
-            args.parameters = json.loads(args.json)
-            print(args.parameters)
-        except json.JSONDecodeError as e:
-            print('Invalid JSON: ', e)
-            exit(1)
+        args.parameters = {'statistics': args.stats}
+    else:
+        if args.json:
+            try:
+                args.parameters = json.loads(args.json)
+                print(args.parameters)
+            except json.JSONDecodeError as e:
+                print('Invalid JSON: ', e)
+                sys.exit(1)
 
-if args.type == 'fifo':
-    fifo_args = {}
-    if args.fifo_file:
-        fifo_args['fifo_file'] = args.fifo_file
-    if args.fifo_fallback:
-        fifo_args['fifo_file_fallback'] = args.fifo_fallback
-    if args.fifo_reply_dir:
-        fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
-    mi = OpenSIPSMI('fifo', **fifo_args)
-    
-if args.type == 'http':
-    mi = OpenSIPSMI('http', url='http://{}:{}/mi'.format(args.ip, args.port))
+    if args.type == 'fifo':
+        fifo_args = {}
+        if args.fifo_file:
+            fifo_args['fifo_file'] = args.fifo_file
+        if args.fifo_fallback:
+            fifo_args['fifo_file_fallback'] = args.fifo_fallback
+        if args.fifo_reply_dir:
+            fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
+        mi = OpenSIPSMI('fifo', **fifo_args)
+    elif args.type == 'http':
+        mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
+    elif args.type == 'datagram':
+        mi = OpenSIPSMI('datagram', datagram_ip=args.ip, datagram_port=args.port)
+    else:
+        print(f'Unknownt type: {args.type}')
+        sys.exit(1)
 
-if args.type == 'datagram':
-    mi = OpenSIPSMI('datagram', datagram_ip=args.ip, datagram_port=args.port)
+    try:
+        response = mi.execute(args.command, args.parameters)
+        print(json.dumps(response, indent=4))
+    except OpenSIPSMIException as e:
+        print('Error: ', e)
+        sys.exit(1)
 
-try:
-    response = mi.execute(args.command, args.parameters)
-    print(json.dumps(response, indent=4))
-except OpenSIPSMIException as e:
-    print('Error: ', e)
-    exit(1)
+if __name__ == "__main__":
+    main()

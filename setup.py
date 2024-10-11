@@ -44,8 +44,8 @@ setup(
     ],
     entry_points = {
         'console_scripts': [
-            'openisps-mi = opensips.mi',
-            'openisps-event = opensips.event',
+            'opensips-mi = opensips.mi.__main__:main',
+            'opensips-event = opensips.event.__main__:main',
         ],
     },
     python_requires=">=3.6"
