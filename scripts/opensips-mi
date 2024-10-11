@@ -27,8 +27,7 @@ communication = parser.add_argument_group('communication')
 
 communication.add_argument('-t', '--type',
                     type=str,
-                    help='OpenSIPS MI Communication Type',
-                    default='http')
+                    help='OpenSIPS MI Communication Type')
 communication.add_argument('-i', '--ip',
                     type=str,
                     help='OpenSIPS MI IP Address',
@@ -37,6 +36,15 @@ communication.add_argument('-p', '--port',
                     type=int,
                     help='OpenSIPS MI Port',
                     default=8888)
+communication.add_argument('-f', '--file',
+                    type=str,
+                    help='OpenSIPS MI FIFO File')
+communication.add_argument('-fb', '--fallback',
+                    type=str,
+                    help='OpenSIPS MI Fallback FIFO File')
+communication.add_argument('-fd', '--dir',
+                    type=str,
+                    help='OpenSIPS MI FIFO Reply Directory')
 
 group = parser.add_mutually_exclusive_group(required=True)
 
@@ -83,6 +91,16 @@ else:
         except json.JSONDecodeError as e:
             print('Invalid JSON: ', e)
             exit(1)
+
+if not args.type or args.type == 'fifo':
+    fifo_args = {}
+    if args.file:
+        fifo_args['file'] = args.file
+    if args.fallback:
+        fifo_args['fallback'] = args.fallback
+    if args.dir:
+        fifo_args['dir'] = args.dir
+    mi = OpenSIPSMI('fifo', **fifo_args)
     
 if args.type == 'http':
     mi = OpenSIPSMI('http', url='http://{}:{}/mi'.format(args.ip, args.port))

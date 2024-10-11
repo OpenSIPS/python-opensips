@@ -26,8 +26,14 @@ class OpenSIPSMIException(Exception):
     pass
 
 class OpenSIPSMI():
-    def __init__(self, conn: str, **kwargs):
+    def __init__(self, conn="fifo", **kwargs):
         if conn == "fifo":
+            if "fifo_file" not in kwargs:
+                kwargs["fifo_file"] = "/var/run/opensips/opensips_fifo"
+            if "fifo_file_fallback" not in kwargs:
+                kwargs["fifo_file_fallback"] = "/tmp/opensips_fifo"
+            if "fifo_reply_dir" not in kwargs:
+                kwargs["fifo_reply_dir"] = "/tmp"
             self.conn = FIFO(**kwargs)
         elif conn == "datagram":
             self.conn = Datagram(**kwargs)
