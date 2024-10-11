@@ -19,10 +19,7 @@
 
 import argparse
 from opensips.mi import OpenSIPSMI, OpenSIPSMIException
-from opensips.event import OpenSIPSEvent, OpenSIPSEventException
 import json
-import time
-import signal
 
 parser = argparse.ArgumentParser()
 
@@ -30,7 +27,6 @@ communication = parser.add_argument_group('communication')
 
 communication.add_argument('-t', '--type',
                     type=str,
-                    choices=['fifo', 'http', 'datagram'],
                     help='OpenSIPS MI Communication Type')
 communication.add_argument('-i', '--ip',
                     type=str,
@@ -40,44 +36,61 @@ communication.add_argument('-p', '--port',
                     type=int,
                     help='OpenSIPS MI Port',
                     default=8888)
-communication.add_argument('-f', '--file',
-                    metavar='FIFO_FILE',
+communication.add_argument('-f', '--fifo-file',
                     type=str,
                     help='OpenSIPS MI FIFO File')
-communication.add_argument('-fb', '--fallback',
-                    metavar='FIFO_FALLBACK_FILE',
+communication.add_argument('-fb', '--fifo-fallback',
                     type=str,
                     help='OpenSIPS MI Fallback FIFO File')
-communication.add_argument('-fd', '--dir',
-                    metavar='FIFO_DIR',
+communication.add_argument('-fd', '--fifo-reply-dir',
                     type=str,
                     help='OpenSIPS MI FIFO Reply Directory')
 
-event = parser.add_argument_group('event')
+group = parser.add_mutually_exclusive_group(required=True)
 
-event.add_argument('event',
-                    type=str,
-                    help='OpenSIPS Event Name')
+group.add_argument('-s', '--stats',
+                    nargs='+',
+                    default=[],
+                    help='statistics')
 
-event.add_argument('-T', '--transport',
+group.add_argument('command',
+                    nargs='?',
                     type=str,
-                    choices=['datagram', 'stream'],
-                    help='OpenSIPS Event Transport',
-                    required=True)
-event.add_argument('-li', '--listen-ip',
+                    help='command')
+
+group = parser.add_mutually_exclusive_group(required=False)
+
+group.add_argument('-j', '--json',
                     type=str,
-                    help='OpenSIPS Event Listen IP Address',
-                    default='127.0.0.1')
-event.add_argument('-lp', '--listen-port',
-                    type=int,
-                    help='OpenSIPS Event Listen Port',
-                    required=True)
-event.add_argument('-e', '--expire',
-                    type=int,
-                    help='OpenSIPS Event Expire Time',
-                    default=3600)
+                    help='json',
+                    required=False)
+
+group.add_argument('parameters',
+                    nargs='*',
+                    default=[],
+                    help='cmd args')
 
 args = parser.parse_args()
+print(args)
+
+if args.stats:
+    print('Using get_statistics! Be careful not to use command after -s/--stats.')
+    print(args.stats)
+    args.command = 'get_statistics'
+
+    if args.json:
+        print('Cannot use -s/--stats with -j/--json!')
+        exit(1)
+
+    args.parameters = {'statistics': args.stats}
+else:
+    if args.json:
+        try:
+            args.parameters = json.loads(args.json)
+            print(args.parameters)
+        except json.JSONDecodeError as e:
+            print('Invalid JSON: ', e)
+            exit(1)
 
 if args.type == 'fifo':
     fifo_args = {}
@@ -88,40 +101,16 @@ if args.type == 'fifo':
     if args.fifo_reply_dir:
         fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
     mi = OpenSIPSMI('fifo', **fifo_args)
-elif args.type == 'http':
-    mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
-elif args.type == 'datagram':
+    
+if args.type == 'http':
+    mi = OpenSIPSMI('http', url='http://{}:{}/mi'.format(args.ip, args.port))
+
+if args.type == 'datagram':
     mi = OpenSIPSMI('datagram', datagram_ip=args.ip, datagram_port=args.port)
-else:
-    print(f'Unknownt type: {args.type}')
-    sys.exit(1)
-
-event = OpenSIPSEvent(mi, args.transport, ip=args.listen_ip, port=args.listen_port)
-
-def event_handler(message):
-    try:
-        message_json = json.loads(message.decode('utf-8'))
-        print(json.dumps(message_json, indent=4))
-    except json.JSONDecodeError as e:
-        print(f"Failed to decode JSON: {e}")
-
-def timer(*_):
-    """ Timer to notify when the event expires """
-    event.unsubscribe(args.event)
-    sys.exit(0) # successful
-
-if args.expire:
-    signal.signal(signal.SIGALRM, timer)
-    signal.alarm(args.expire)
-
-signal.signal(signal.SIGINT, timer)
-signal.signal(signal.SIGTERM, timer)
 
 try:
-    event.subscribe(args.event, event_handler, expire=args.expire)
-except OpenSIPSEventException as e:
-    print(e)
-    sys.exit(1)
-
-while True:
-    time.sleep(1)
+    response = mi.execute(args.command, args.parameters)
+    print(json.dumps(response, indent=4))
+except OpenSIPSMIException as e:
+    print('Error: ', e)
+    exit(1)

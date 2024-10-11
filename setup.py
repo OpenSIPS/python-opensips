@@ -17,9 +17,14 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 ##
 
+""" Setup module for OpenSIPS package """
+
 from setuptools import setup, find_packages
 
 from opensips import version
+
+with open('README.md', encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name="opensips",
@@ -29,7 +34,7 @@ setup(
     author="Darius Stefan",
     author_email="darius.stefan@opensips.org",
     description="OpenSIPS Python Packages",
-    long_description=open('README.md').read(),
+    long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/OpenSIPS/python-opensips",
     classifiers=[
@@ -37,6 +42,11 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
     ],
-    scripts=['scripts/opensips-mi', 'scripts/opensips-event'],
+    entry_points = {
+        'console_scripts': [
+            'openisps-mi = opensips.mi',
+            'openisps-event = opensips.event',
+        ],
+    },
     python_requires=">=3.6"
 )
