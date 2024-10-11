@@ -21,6 +21,13 @@ mi = OpenSIPSMI('datagram', datagram_ip='127.0.0.1', datagram_port=8080)
 mi = OpenSIPSMI('fifo', fifo_file='/tmp/opensips_fifo', fifo_file_fallback='/tmp/opensips_fifo_fallback', fifo_reply_dir='/tmp/opensips/')
 ```
 
+### Defaults
+
+By default, `fifo` communication type is used with the following parameters:
+* `fifo_file` - `/var/run/opensips/opensips_fifo`
+* `fifo_file_fallback` - `/tmp/opensips_fifo`
+* `fifo_reply_dir` - `/tmp`
+
 ## Methods
 
 The `OpenSIPSMI` class provides the following methods:
