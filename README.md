@@ -61,11 +61,14 @@ Currently, the following packages are available:
 * [Event Interface](docs/event.md) - lists the supported event transport protocols and provides information about the required parameters for each protocol.
 
 ## Scripts
-
-After installing the package, you can use the provided [opensips-mi](scripts/opensips-mi) script to run MI commands. This script takes the following arguments:
-- `-t` or `--type` - the type of the MI communication ()`http` or `datagram`)
+### MI
+After installing the package, you can use the provided [opensips-mi](opensips/mi/__main__.py) script to run MI commands. This script takes the following arguments:
+- `-t` or `--type` - the type of the MI communication (`http`, `datagram` or `fifo`).
 - `-i` or `--ip` - the IP address of the OpenSIPS server.
 - `-p` or `--port` - the port of the OpenSIPS MI.
+- `-f` or `--fifo-file` - the path to the FIFO file.
+- `-fb` or `--fifo-fallback` - the path to the FIFO fallback file.
+- `-fd` or `--fifo-reply-dir` - the directory where the FIFO reply files are stored.
 
 #### Usage
 ```bash
@@ -77,6 +80,20 @@ opensips-mi -t datagram -p 8080 -s core: shmem:
 
 # you can pass json string as argument with -j flag for commands that require arrays as arguments
 opensips-mi -t datagram -p 8080 get_statistics -j "{'statistics': ['core:', 'shmem:']}"
+```
+
+### Event
+You can use the provided [opensips-event](opensips/event/__main__.py) script to subscribe for OpenSIPS events. This script takes the following arguments:
+- all the above arguments for the MI communication
+- `-T` or `--transport` - the transport protocol to use (`datagram`, `stream`).
+- `-li` or `--listen-ip` - the IP address to listen on.
+- `-lp` or `--listen-port` - the port to listen on.
+- `-e` or `--expire` - the expiration time for the subscription.
+- the event name to subscribe for.
+
+#### Usage
+```bash
+opensips-event -t datagram -p 8080 -T datagram -lp 50012 -e 3600 E_PIKE_BLOCKED
 ```
 
 ## License
