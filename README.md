@@ -47,7 +47,7 @@ Currently, the following packages are available:
     hdl = OpenSIPSEventHandler(mi_connector, 'datagram', ip='127.0.0.1', port=50012)
 
     def some_callback(message):
-        # do something with the message
+        # do something with the message (it is a JSON object)
         pass
     
     ev: OpenSIPSEvent = None
