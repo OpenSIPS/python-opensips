@@ -19,4 +19,5 @@
 
 """ Event package of OpenSIPS """
 
-from .subscriber import OpenSIPSEvent, OpenSIPSEventException
+from .event import OpenSIPSEvent, OpenSIPSEventException
+from .handler import OpenSIPSEventHandler

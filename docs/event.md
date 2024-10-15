@@ -1,28 +1,45 @@
 # OpenSIPS Python Packages - Event Interface
 
-This package can be used to subscribe to OpenSIPS Event Interface events.
+This package can be used to subscribe to OpenSIPS events.
 
 ## Supported backend protocols
 
 The following event transport protocols are supported:
-* `datagram` - uses either UDP or UNIX datagram to receive notifications for subscribed events. If using UDP, the `ip` and `port` parameters are required. If using UNIX datagram, the `socket_path` parameter is required.
-* `stream` - uses TCP to communicate with the Event Interface. Requires the `ip` and `port` parameters to be set.
+* `datagram` (Default) - uses either UDP or UNIX datagram to receive notifications for subscribed events. By default, the UDP protocol is used with the `ip` and `port` parameters set to `127.0.0.1` and `50060` respectively, but you can tune them to your needs.
+To use the UNIX datagram, set the `socket_path` parameter.
+* `stream` - uses TCP to communicate with the Event Interface. Default values for `ip` and `port` are `127.0.0.1` and `50060` respectively, but you can change them as needed.
 
 ## How to use
 
-To instantiate the `OpenSIPSEvent` class, you need to provide a MI connector, the backend protocol and the required parameters in a key-value format. Then `subscribe` and `unsubscribe` methods can be used to manage the subscriptions.
+To subscribe to events, you must instantiate an `OpenSIPSEventHandler`. This class can be used to subscribe and unsubscribe from events. It uses an `OpenSIPSMI` object to communicate with the OpenSIPS MI interface. By default, a MI connector is created with the `fifo` type, but you can set it as a parameter in the constructor. As said before, the default transport protocol is `datagram`, but you can change it by setting the `_type` parameter.
+
+Next step is to create an `OpenSIPSEvent` object. This can be done by calling the `subscribe` method of the `OpenSIPSEventHandler` object or by creating an `OpenSIPSEvent` object directly. The `subscribe` method will return an `OpenSIPSEvent` object.
+
+To unsubscribe from an event, you can call the `unsubscribe` method of the `OpenSIPSEvent` object or the `unsubscribe` method of the `OpenSIPSEventHandler` object.
 
 ```python
+from opensips.mi import OpenSIPSMI, OpenSIPSMIException
+from opensips.event import OpenSIPSEvent, OpenSIPSEventException
+
+# simple way
+hdl = OpenSIPSEventHandler()
+
+# tuned way
 mi_connector = OpenSIPSMI('http', url='http://localhost:8888/mi')
-event = OpenSIPSEvent(mi_connector, 'datagram', ip='127.0.0.1', port=50012)
+hdl = OpenSIPSEventHandler(mi_connector, 'datagram', ip='127.0.0.1', port=50012)
 
 try:
-    event.subscribe('E_PIKE_BLOCKED', some_callback)
+    ev = hdl.subscribe('E_PIKE_BLOCKED', some_callback)
 except OpenSIPSEventException as e:
     # handle the exception
 
+# or create an OpenSIPSEvent object directly
+ev = OpenSIPSEvent(hdl, 'E_PIKE_BLOCKED', some_callback)
+
 try:
-    event.unsubscribe('E_PIKE_BLOCKED')
+    ev.unsubscribe()
+    # or
+    hdl.unsubscribe('E_PIKE_BLOCKED')
 except OpenSIPSEventException as e:
     # handle the exception
 ```

@@ -27,13 +27,8 @@ class Stream(GenericSocket):
     """ TCP/Stream implementation of a socket """
 
     def __init__(self, **kwargs):
-        if "ip" not in kwargs:
-            raise ValueError("ip is required for Stream connector")
-        if "port" not in kwargs:
-            raise ValueError("port is required for Stream connector")
-
-        self.ip = kwargs["ip"]
-        self.port = int(kwargs["port"])
+        self.ip = kwargs.get("ip", "127.0.0.1")
+        self.port = int(kwargs.get("port", 50060))
         self.sock = None
         self.sock_name = None
 
