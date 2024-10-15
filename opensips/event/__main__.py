@@ -108,8 +108,7 @@ def main():
     def event_handler(message):
         """ Event handler callback """
         try:
-            message_json = json.loads(message.decode('utf-8'))
-            print(json.dumps(message_json, indent=4))
+            print(json.dumps(message, indent=4))
         except json.JSONDecodeError as e:
             print(f"Failed to decode JSON: {e}")
 
