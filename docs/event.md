@@ -44,6 +44,8 @@ except OpenSIPSEventException as e:
     # handle the exception
 ```
 
+If `callback` function is called with `None` as a parameter, it means that there was an error while receiving the event and no JSON object could be parsed from the received data after 10 retries.
+
 ## Subscribing
 
 By default, the subscription will be permanent. If you want to set a timeout, you can use the `expires` parameter. The value should be an integer representing the number of seconds the subscription will be active.

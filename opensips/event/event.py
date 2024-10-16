@@ -40,6 +40,7 @@ class OpenSIPSEvent():
         self.thread_stop.clear()
         self.buf = b""
         self.json_queue = []
+        self.retries = 0
 
         try:
             self.socket = self._handler.__new_socket__()
@@ -63,7 +64,16 @@ class OpenSIPSEvent():
             
             self.buf += data
             self.json_queue, self.buf = extract_json(self.json_queue, self.buf)
+
+            if not self.json_queue:
+                self.retries += 1
+
+            if self.retries > 10:
+                callback(None)
+                break
+
             while self.json_queue:
+                self.retries = 0
                 json_obj = self.json_queue.pop(0)
                 callback(json_obj)
 

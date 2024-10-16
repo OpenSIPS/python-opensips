@@ -107,6 +107,10 @@ def main():
 
     def event_handler(message):
         """ Event handler callback """
+        if message is None:
+            ev.unsubscribe()
+            sys.exit(1)
+
         try:
             print(json.dumps(message, indent=4))
         except json.JSONDecodeError as e:
