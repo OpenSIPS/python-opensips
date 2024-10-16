@@ -27,8 +27,8 @@ class Stream(GenericSocket):
     """ TCP/Stream implementation of a socket """
 
     def __init__(self, **kwargs):
-        self.ip = kwargs.get("ip", "127.0.0.1")
-        self.port = int(kwargs.get("port", 50060))
+        self.ip = kwargs.get("ip", "0.0.0.0")
+        self.port = int(kwargs.get("port", 0))
         self.sock = None
         self.sock_name = None
 

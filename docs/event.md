@@ -5,9 +5,9 @@ This package can be used to subscribe to OpenSIPS events.
 ## Supported backend protocols
 
 The following event transport protocols are supported:
-* `datagram` (Default) - uses either UDP or UNIX datagram to receive notifications for subscribed events. By default, the UDP protocol is used with the `ip` and `port` parameters set to `127.0.0.1` and `50060` respectively, but you can tune them to your needs.
+* `datagram` (Default) - uses either UDP or UNIX datagram to receive notifications for subscribed events. By default, the UDP protocol is used with the `ip` and `port` parameters set to `0.0.0.0` and `0` (any available port) respectively, but you can tune them to your needs.
 To use the UNIX datagram, set the `socket_path` parameter.
-* `stream` - uses TCP to communicate with the Event Interface. Default values for `ip` and `port` are `127.0.0.1` and `50060` respectively, but you can change them as needed.
+* `stream` - uses TCP to communicate with the Event Interface. Default values for `ip` and `port` are `0.0.0.0` and `0` (any available port) respectively, but you can change them as needed.
 
 ## How to use
 
