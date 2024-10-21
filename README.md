@@ -66,6 +66,7 @@ Currently, the following packages are available:
 
 * [MI](docs/mi.md) - contains information about supported MI communication types and required parameters for each type.
 * [Event Interface](docs/event.md) - lists the supported event transport protocols and provides information about the required parameters for each protocol.
+* [Docker](docker/docker.md) - provides information about the Docker image that contains the OpenSIPS Python packages.
 
 ## Scripts
 ### MI
