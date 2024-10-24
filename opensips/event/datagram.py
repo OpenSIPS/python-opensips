@@ -33,11 +33,9 @@ class Datagram(GenericSocket):
 
         if "unix_path" in kwargs:
             self.sock_name = kwargs["unix_path"]
-        elif "ip" in kwargs and "port" in kwargs:
-            self.ip = kwargs["ip"]
-            self.port = int(kwargs["port"])
         else:
-            raise ValueError("ip and port or unix_path is required for Datagram connector")
+            self.ip = kwargs.get("ip", "0.0.0.0")
+            self.port = int(kwargs.get("port", 0))
 
     def create(self):
         if self.ip is not None:

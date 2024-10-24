@@ -18,11 +18,17 @@ Currently, the following packages are available:
     pip install .
     ```
 
+    or from PyPI:
+
+    ```bash
+    pip install opensips
+    ```
+
 2. Import the package in your Python code:
 
     ```python
     from opensips.mi import OpenSIPSMI, OpenSIPSMIException
-    from opensips.event import OpenSIPSEvent, OpenSIPSEventException
+    from opensips.event import OpenSIPSEvent, OpenSIPSEventException, OpenSIPSEventHandler
     ```
 
 3. Use the methods provided by the modules:
@@ -38,19 +44,20 @@ Currently, the following packages are available:
 
     ```python
     mi_connector = OpenSIPSMI('http', url='http://localhost:8888/mi')
-    event = OpenSIPSEvent(mi_connector, 'datagram', ip='127.0.0.1', port=50012)
+    hdl = OpenSIPSEventHandler(mi_connector, 'datagram', ip='127.0.0.1', port=50012)
 
     def some_callback(message):
         # do something with the message
         pass
-
+    
+    ev: OpenSIPSEvent = None
     try:
-        event.subscribe('E_PIKE_BLOCKED', some_callback)
+        event = hdl.subscribe('E_PIKE_BLOCKED', some_callback)
     except OpenSIPSEventException as e:
         # handle the exception
 
     try:
-        event.unsubscribe('E_PIKE_BLOCKED')
+        ev.unsubscribe('E_PIKE_BLOCKED')
     except OpenSIPSEventException as e:
         # handle the exception
     ```
