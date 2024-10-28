@@ -48,7 +48,7 @@ If `callback` function is called with `None` as a parameter, it means that there
 
 ## Subscribing
 
-By default, the subscription will be permanent. If you want to set a timeout, you can use the `expires` parameter. The value should be an integer representing the number of seconds the subscription will be active.
+By default, the subscription will be permanent with a resubscribing interval of 1 hour. If you want to set a timeout, you can use the `expires` parameter. The value should be an integer representing the number of seconds the subscription will be active.
 
 ## How it works
 

@@ -54,12 +54,9 @@ class OpenSIPSEventHandler():
     def unsubscribe(self, event_name: str):
         self.events[event_name].unsubscribe()
 
-    def __mi_subscribe__(self, event_name: str, sock_name: str, expire=None):
+    def __mi_subscribe__(self, event_name: str, sock_name: str, expire):
         try:
-            if expire is None:
-                ret_val = self.mi.execute("event_subscribe", [event_name, sock_name])
-            else:
-                ret_val = self.mi.execute("event_subscribe", [event_name, sock_name, expire])
+            ret_val = self.mi.execute("event_subscribe", [event_name, sock_name, expire])
 
             if ret_val != "OK":
                 raise OpenSIPSEventException("Failed to subscribe to event")
