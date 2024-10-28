@@ -20,5 +20,5 @@
 """ Main package of OpenSIPS """
 
 from .mi import OpenSIPSMI
-from .event import OpenSIPSEvent
+from .event import OpenSIPSEvent, AsyncOpenSIPSEvent
 from .version import __version__

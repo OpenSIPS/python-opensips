@@ -21,3 +21,5 @@
 
 from .event import OpenSIPSEvent, OpenSIPSEventException
 from .handler import OpenSIPSEventHandler
+from .asyncevent import AsyncOpenSIPSEvent
+from .asynchandler import AsyncOpenSIPSEventHandler
