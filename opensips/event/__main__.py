@@ -25,7 +25,7 @@ import time
 import signal
 import argparse
 from opensips.mi import OpenSIPSMI
-from opensips.event import OpenSIPSEvent, OpenSIPSEventException
+from opensips.event import OpenSIPSEventHandler, OpenSIPSEventException
 
 parser = argparse.ArgumentParser()
 
@@ -100,10 +100,10 @@ def main():
     elif args.type == 'datagram':
         mi = OpenSIPSMI('datagram', datagram_ip=args.ip, datagram_port=args.port)
     else:
-        print(f'Unknownt type: {args.type}')
+        print(f'Unknown type: {args.type}')
         sys.exit(1)
 
-    ev = OpenSIPSEvent(mi, args.transport, ip=args.listen_ip, port=args.listen_port)
+    hdl = OpenSIPSEventHandler(mi, args.transport, ip=args.listen_ip, port=args.listen_port)
 
     def event_handler(message):
         """ Event handler callback """
@@ -113,9 +113,11 @@ def main():
         except json.JSONDecodeError as e:
             print(f"Failed to decode JSON: {e}")
 
+    ev = None
+
     def timer(*_):
         """ Timer to notify when the event expires """
-        ev.unsubscribe(args.event)
+        ev.unsubscribe()
         sys.exit(0) # successful
 
     if args.expire:
@@ -126,7 +128,7 @@ def main():
     signal.signal(signal.SIGTERM, timer)
 
     try:
-        ev.subscribe(args.event, event_handler, expire=args.expire)
+        ev = hdl.subscribe(args.event, event_handler, args.expire)
     except OpenSIPSEventException as e:
         print(e)
         sys.exit(1)
