@@ -86,6 +86,8 @@ class AsyncOpenSIPSEvent():
                 except OpenSIPSMIException as e:
                     return
                 await asyncio.sleep(self.expire - 60)
+                if not self.reregister:
+                    break
         except asyncio.CancelledError:
             pass
 
