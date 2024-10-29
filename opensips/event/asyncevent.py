@@ -1,31 +1,32 @@
 #!/usr/bin/env python
-##
-## This file is part of the OpenSIPS Python Package
-## (see https://github.com/OpenSIPS/python-opensips).
-##
-## This program is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with this program. If not, see <http://www.gnu.org/licenses/>.
-##
+#
+# This file is part of the OpenSIPS Python Package
+# (see https://github.com/OpenSIPS/python-opensips).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 
 """ Module that implements OpenSIPS Event behavior with asyncio """
 
-from ..mi import OpenSIPSMIException
-from .json_helper import extract_json
-from .event import OpenSIPSEventException
 import asyncio
+from ..mi import OpenSIPSMIException
+from .json_helper import JsonBuffer, JsonBufferMaxAttempts
+from .event import OpenSIPSEventException
 
-class AsyncOpenSIPSEvent():
+
+class AsyncOpenSIPSEvent():  # pylint: disable=too-many-instance-attributes
 
     """ Asyncio implementation of the OpenSIPS Event """
 
@@ -33,9 +34,7 @@ class AsyncOpenSIPSEvent():
         self._handler = handler
         self.name = name
         self.callback = callback
-        self.buf = b""
-        self.json_queue = []
-        self.retries = 0
+        self.buf = JsonBuffer()
         if expire is not None:
             self.expire = expire
             self.reregister = False
@@ -49,41 +48,37 @@ class AsyncOpenSIPSEvent():
             self._handler.events[self.name] = self
             self.resubscribe_task = asyncio.create_task(self.resubscribe())
             loop = asyncio.get_running_loop()
-            loop.add_reader(self.socket.sock.fileno(), self.handle, self.callback)
+            loop.add_reader(self.socket.sock.fileno(),
+                            self.handle, self.callback)
 
         except ValueError as e:
-            raise OpenSIPSEventException("Invalid arguments for socket creation: {}".format(e))
+            raise OpenSIPSEventException("Invalid arguments") from e
 
     def handle(self, callback):
         """ Handles the event callbacks """
         data = self.socket.read()
         if not data:
             return
-        
-        self.buf += data
-        self.json_queue, self.buf = extract_json(self.json_queue, self.buf)
 
-        if not self.json_queue:
-            self.retries += 1
-
-        if self.retries > 10:
+        try:
+            self.buf.push(data)
+            while j := self.buf.pop():
+                callback(j)
+        except JsonBufferMaxAttempts:
             callback(None)
             return
-
-        while self.json_queue:
-            self.retries = 0
-            json_obj = self.json_queue.pop(0)
-            callback(json_obj)
 
     async def resubscribe(self):
         """ Resubscribes for the event """
         try:
             while True:
                 try:
-                    self._handler.__mi_subscribe__(self.name, self.socket.sock_name, self.expire)
-                except OpenSIPSEventException as e:
+                    self._handler.__mi_subscribe__(self.name,
+                                                   self.socket.sock_name,
+                                                   self.expire)
+                except OpenSIPSEventException:
                     return
-                except OpenSIPSMIException as e:
+                except OpenSIPSMIException:
                     return
                 await asyncio.sleep(self.expire - 60)
                 if not self.reregister:

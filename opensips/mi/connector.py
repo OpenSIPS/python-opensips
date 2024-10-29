@@ -1,21 +1,21 @@
 #!/usr/bin/env python
-##
-## This file is part of the OpenSIPS Python Package
-## (see https://github.com/OpenSIPS/python-opensips).
-##
-## This program is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with this program. If not, see <http://www.gnu.org/licenses/>.
-##
+#
+# This file is part of the OpenSIPS Python Package
+# (see https://github.com/OpenSIPS/python-opensips).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 """ Connector implementation for OpenSIPS MI """
 
@@ -24,8 +24,10 @@ from .datagram import Datagram
 from .http import HTTP
 from .jsonrpc_helper import JSONRPCError, JSONRPCException
 
+
 class OpenSIPSMIException(Exception):
     """ Generic OpenSIPS MI Exception """
+
 
 class OpenSIPSMI():
     """ OpenSIPS MI Implementation """
@@ -54,7 +56,8 @@ class OpenSIPSMI():
         except JSONRPCError as e:
             raise OpenSIPSMIException(f"Error executing command: {e}") from e
         except JSONRPCException as e:
-            raise OpenSIPSMIException(f"Error with connection: {e}. Is OpenSIPS running?") from e
+            raise OpenSIPSMIException(f"Error with connection: {e}. "
+                                      "Is OpenSIPS running?") from e
         return ret_val
 
     def valid(self):
@@ -63,3 +66,5 @@ class OpenSIPSMI():
             return self.validated
         self.validated = self.conn.valid()
         return self.validated
+
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

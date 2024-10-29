@@ -1,21 +1,21 @@
 #!/usr/bin/env python
-##
-## This file is part of the OpenSIPS Python Package
-## (see https://github.com/OpenSIPS/python-opensips).
-##
-## This program is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with this program. If not, see <http://www.gnu.org/licenses/>.
-##
+#
+# This file is part of the OpenSIPS Python Package
+# (see https://github.com/OpenSIPS/python-opensips).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 """ MI FIFO implementation """
 
@@ -27,6 +27,7 @@ import errno
 from .connection import Connection
 from . import jsonrpc_helper
 
+
 class FIFO(Connection):
 
     """ MI FIFO Connection """
@@ -35,11 +36,11 @@ class FIFO(Connection):
 
     def __init__(self, **kwargs):
         if "fifo_file" not in kwargs:
-            raise ValueError("fifo_file is required for FIFO connector")
+            raise ValueError("fifo_file is required for FIFO")
         if "fifo_file_fallback" not in kwargs:
-            raise ValueError("fifo_file_fallback is required for FIFO connector")
+            raise ValueError("fifo_file_fallback is required for FIFO")
         if "fifo_reply_dir" not in kwargs:
-            raise ValueError("fifo_reply_dir is required for FIFO connector")
+            raise ValueError("fifo_reply_dir is required for FIFO")
 
         self.fifo_file = kwargs["fifo_file"]
         self.fifo_file_fallback = kwargs["fifo_file_fallback"]
@@ -52,23 +53,27 @@ class FIFO(Connection):
             raise jsonrpc_helper.JSONRPCException(msg)
         jsoncmd = jsonrpc_helper.get_command(method, params)
 
-        reply_fifo_file_name = self.REPLY_FIFO_FILE_TEMPLATE\
-                        .format(os.getpid(), str(time.time()).replace(".", "_"))
-        reply_fifo_file_path = os.path.join(self.fifo_reply_dir, reply_fifo_file_name)
+        cur_time = str(time.time()).replace(".", "_")
+        reply_format = self.REPLY_FIFO_FILE_TEMPLATE
+        reply_fifo_file_name = reply_format.format(os.getpid(), cur_time)
+        reply_fifo_file_path = os.path.join(self.fifo_reply_dir,
+                                            reply_fifo_file_name)
 
         try:
             os.unlink(reply_fifo_file_path)
         except OSError as e:
             if os.path.exists(reply_fifo_file_path):
-                raise jsonrpc_helper.JSONRPCException(
-                    f"Could not remove old reply FIFO file {reply_fifo_file_path}: {e}")
+                msg = "Could not remove old reply FIFO file " + \
+                        f"{reply_fifo_file_path}: {e}"
+                raise jsonrpc_helper.JSONRPCException(msg)
 
         try:
             os.mkfifo(reply_fifo_file_path)
             os.chmod(reply_fifo_file_path, 0o666)
         except OSError as e:
-            raise jsonrpc_helper.JSONRPCException(
-                f"Could not create reply FIFO file {reply_fifo_file_path}: {e}")
+            msg = "Could not create reply FIFO file " + \
+                    f"{reply_fifo_file_path}: {e}"
+            raise jsonrpc_helper.JSONRPCException(msg)
 
         if not os.path.exists(self.fifo_file):
             raise jsonrpc_helper.JSONRPCException(
@@ -79,12 +84,13 @@ class FIFO(Connection):
             with open(self.fifo_file, "w", encoding="utf-8") as fifo:
                 fifo.write(fifocmd)
         except Exception as e:
-            raise jsonrpc_helper.JSONRPCException(
-                "Could not access FIFO file {self.fifo_file}: {e}")
+            msg = f"Could not access FIFO file {self.fifo_file}: {e}"
+            raise jsonrpc_helper.JSONRPCException(msg)
 
         reply = None
         try:
-            with open(reply_fifo_file_path, "r", encoding="utf-8") as reply_fifo:
+            with open(reply_fifo_file_path, "r",
+                      encoding="utf-8") as reply_fifo:
                 reply = reply_fifo.readline()
         except KeyboardInterrupt:
             sys.exit(-1)
@@ -109,16 +115,14 @@ class FIFO(Connection):
             if e.errno == errno.EACCES:
                 sticky = self.get_sticky(os.path.dirname(opensips_fifo))
                 if sticky:
-                    extra = ["starting with Linux kernel 4.19, processes can " +
-                            "no longer read from FIFO files ",
-                            "that are saved in directories with sticky " +
-                            f"bits (such as {sticky})",
-                            "and are not owned by the same user the " +
-                            "process runs with. ",
-                            "To fix this, either store the file in a non-sticky " +
-                            "bit directory (such as /var/run/opensips), ",
-                            "or disable fifo file protection using " +
-                            "'sysctl fs.protected_fifos=0' (NOT RECOMMENDED)"]
+                    extra = [f"""starting with Linux kernel 4.19, processes
+                    can no longer read from FIFO files ", that are saved in
+                    directories with sticky bits (such as {sticky}) and are
+                    not owned by the same user the process runs with.  To fix
+                    this, either store the file in a non-sticky bit directory
+                    (such as /var/run/opensips), or disable fifo file
+                    protection using 'sysctl fs.protected_fifos=0' (NOT
+                    RECOMMENDED)"""]
             msg = f"Could not access FIFO file {opensips_fifo}: {e}"
             return (False, [msg] + extra)
         self.fifo_file = opensips_fifo
@@ -131,3 +135,5 @@ class FIFO(Connection):
         if os.stat(path).st_mode & 0o1000 == 0o1000:
             return path
         return self.get_sticky(os.path.split(path)[0])
+
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4

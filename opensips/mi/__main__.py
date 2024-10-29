@@ -1,21 +1,21 @@
 #!/usr/bin/env python
-##
-## This file is part of the OpenSIPS Python Package
-## (see https://github.com/OpenSIPS/python-opensips).
-##
-## This program is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## This program is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with this program. If not, see <http://www.gnu.org/licenses/>.
-##
+#
+# This file is part of the OpenSIPS Python Package
+# (see https://github.com/OpenSIPS/python-opensips).
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 """ Script to run OpenSIPS MI commands """
 
@@ -29,59 +29,60 @@ parser = argparse.ArgumentParser()
 communication = parser.add_argument_group('communication')
 
 communication.add_argument('-t', '--type',
-                    type=str,
-                    default='fifo',
-                    choices=['fifo', 'http', 'datagram'],
-                    help='OpenSIPS MI Communication Type')
+                           type=str,
+                           default='fifo',
+                           choices=['fifo', 'http', 'datagram'],
+                           help='OpenSIPS MI Communication Type')
 communication.add_argument('-i', '--ip',
-                    type=str,
-                    help='OpenSIPS MI IP Address',
-                    default='127.0.0.1')
+                           type=str,
+                           help='OpenSIPS MI IP Address',
+                           default='127.0.0.1')
 communication.add_argument('-p', '--port',
-                    type=int,
-                    help='OpenSIPS MI Port',
-                    default=8888)
+                           type=int,
+                           help='OpenSIPS MI Port',
+                           default=8888)
 communication.add_argument('-f', '--fifo-file',
-                    type=str,
-                    help='OpenSIPS MI FIFO File')
+                           type=str,
+                           help='OpenSIPS MI FIFO File')
 communication.add_argument('-fb', '--fifo-fallback',
-                    type=str,
-                    help='OpenSIPS MI Fallback FIFO File')
+                           type=str,
+                           help='OpenSIPS MI Fallback FIFO File')
 communication.add_argument('-fd', '--fifo-reply-dir',
-                    type=str,
-                    help='OpenSIPS MI FIFO Reply Directory')
+                           type=str,
+                           help='OpenSIPS MI FIFO Reply Directory')
 
 group = parser.add_mutually_exclusive_group(required=True)
 
 group.add_argument('-s', '--stats',
-                    nargs='+',
-                    default=[],
-                    help='statistics')
+                   nargs='+',
+                   default=[],
+                   help='statistics')
 
 group.add_argument('command',
-                    nargs='?',
-                    type=str,
-                    help='command')
+                   nargs='?',
+                   type=str,
+                   help='command')
 
 group = parser.add_mutually_exclusive_group(required=False)
 
 group.add_argument('-j', '--json',
-                    type=str,
-                    help='json',
-                    required=False)
+                   type=str,
+                   help='json',
+                   required=False)
 
 group.add_argument('parameters',
-                    nargs='*',
-                    default=[],
-                    help='cmd args')
+                   nargs='*',
+                   default=[],
+                   help='cmd args')
+
 
 def main():
     """ Main function of the opensips-mi script """
     args = parser.parse_args()
 
     if args.stats:
-        print('Using get_statistics! Be careful not to use command after -s/--stats.')
-        print(args.stats)
+        print('Using get_statistics! Be careful not to use '
+              'command after -s/--stats.')
         args.command = 'get_statistics'
 
         if args.json:
@@ -110,7 +111,9 @@ def main():
     elif args.type == 'http':
         mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
     elif args.type == 'datagram':
-        mi = OpenSIPSMI('datagram', datagram_ip=args.ip, datagram_port=args.port)
+        mi = OpenSIPSMI('datagram',
+                        datagram_ip=args.ip,
+                        datagram_port=args.port)
     else:
         print(f'Unknownt type: {args.type}')
         sys.exit(1)
@@ -122,5 +125,8 @@ def main():
         print('Error: ', e)
         sys.exit(1)
 
+
 if __name__ == "__main__":
     main()
+
+# vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
