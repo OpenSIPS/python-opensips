@@ -1,6 +1,6 @@
 # OpenSIPS Python Packages
 
-This repository contains a collection of Python packages for OpenSIPS. These modules are designed to be as lightweight as possible and provide a simple interface for interacting with OpenSIPS.
+This repository contains a collection of Python packages for OpenSIPS. These modules are designed to be as lightweight as possible and provide a simple interface for interacting with OpenSIPS. Alongside the source code, the repository also contains a [Docker](docker/Dockerfile) image that comes with the OpenSIPS Python packages pre-installed.
 
 ## Features
 
