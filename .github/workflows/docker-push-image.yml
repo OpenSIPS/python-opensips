@@ -1,4 +1,4 @@
-name: Push OpenSIPS Python Images in Docker Hub
+name: Push OpenSIPS Python Images to Docker Hub
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')  # only publish to Docker Hub on tag pushes
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
 
     steps:
     - uses: actions/checkout@v3
@@ -18,6 +18,17 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
 
+    - name: Get latest tag if manually triggered
+      id: get_tag
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          git fetch --tags
+          LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+          echo "tag=$LATEST_TAG" >> $GITHUB_ENV
+        else
+          echo "tag=${{ github.ref_name }}" >> $GITHUB_ENV
+        fi
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
@@ -25,4 +36,4 @@ jobs:
         push: true
         tags: |
           opensips/python-opensips:latest
-          opensips/python-opensips:${{ github.ref_name }}
+          opensips/python-opensips:${{ env.tag }}
