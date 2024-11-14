@@ -2,14 +2,12 @@ name: Push OpenSIPS Python Images in Docker Hub
 
 on:
   push:
-  repository_dispatch:
   workflow_dispatch:
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')  # only publish to Docker Hub on tag pushes
 
     steps:
     - uses: actions/checkout@v3
@@ -25,4 +23,6 @@ jobs:
       with:
         context: .
         push: true
-        tags: opensips/python-opensips:latest
+        tags: |
+          opensips/python-opensips:latest
+          opensips/python-opensips:${{ github.ref_name }}
