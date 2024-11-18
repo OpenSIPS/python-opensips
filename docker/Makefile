@@ -6,5 +6,5 @@ all: build
 .PHONY: build
 build:
 	docker build \
-		--tag="opensips/pyhton-opensips:$(OPENSIPS_DOCKER_TAG)" \
+		--tag="opensips/python-opensips:$(OPENSIPS_DOCKER_TAG)" \
 		.
