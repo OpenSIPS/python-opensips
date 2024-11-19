@@ -9,7 +9,7 @@ Homepage: https://github.com/OpenSIPS/python-opensips
 Package: python3-opensips
 Architecture: all
 Multi-Arch: foreign
-Depends: python3 (>= 3.6), ${misc:Depends}, ${python3:Depends}
+Depends: python3 (>= 3.6), ${misc:Depends}, ${python3:Depends}, python3-setuptools
 Description:  A collection of Python packages for OpenSIPS.
  These modules are designed to be as lightweight as possible and provide a
  simple interface for interacting with OpenSIPS.
