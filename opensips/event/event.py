@@ -85,8 +85,10 @@ class OpenSIPSEvent():  # pylint: disable=too-many-instance-attributes
 
             try:
                 self.buf.push(data)
-                while j := self.buf.pop():
+                j = self.buf.pop()
+                while j:
                     callback(j)
+                    j = self.buf.pop()
             except JsonBufferMaxAttempts:
                 callback(None)
                 return

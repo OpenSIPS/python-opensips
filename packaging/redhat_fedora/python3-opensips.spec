@@ -1,0 +1,61 @@
+Summary:  A collection of Python packages for OpenSIPS.
+Name:     python3-opensips
+Version:  0.1.3
+Release:  1%{?dist}
+License:  GPL-3+
+Group:    System Environment/Daemons
+Source0:  Source0:  http://download.opensips.org/python/%{name}-%{version}.tar.gz
+URL:      https://github.com/OpenSIPS/python-opensips
+
+BuildArch: noarch
+
+BuildRequires:  python%{python3_pkgversion}-setuptools, python%{python3_pkgversion}-devel
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+AutoReqProv: no
+
+Requires: python3 >= 3.6
+
+%description
+A collection of Python packages for OpenSIPS.
+These modules are designed to be as lightweight as possible and provide a
+simple interface for interacting with OpenSIPS.
+.
+OpenSIPS is a very fast and flexible SIP (RFC3261)
+server. Written entirely in C, OpenSIPS can handle thousands calls
+per second even on low-budget hardware.
+.
+C Shell-like scripting language provides full control over the server's
+behaviour. Its modular architecture allows only required functionality to be
+loaded.
+.
+Among others, the following modules are available: Digest Authentication, CPL
+scripts, Instant Messaging, MySQL support, Presence Agent, Radius
+Authentication, Record Routing, SMS Gateway, Jabber/XMPP Gateway, Transaction
+Module, Registrar and User Location, Load Balaning/Dispatching/LCR,
+XMLRPC Interface.
+
+%prep
+%autosetup -n %{name}
+
+%build
+%py3_build
+
+%install
+%py3_install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%{_bindir}/opensips-event
+%{_bindir}/opensips-mi
+%{python3_sitelib}/opensips/*
+%{python3_sitelib}/opensips-*.egg-info
+%doc README.md
+%doc docs/*
+%license LICENSE
+
+%changelog
+* Tue Nov 19 2024 Razvan Crainea <razvan@opensips.org> - 0.1.3-3
+- Initial spec.

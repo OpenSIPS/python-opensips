@@ -1,0 +1,6 @@
+version=3
+
+opts=filenamemangle=s/.+\/v?(\d\S*)\.tar\.gz/python-opensips-$1\.tar\.gz/ \
+  https://github.com/OpenSIPS/python-opensips/tags .*/v?(\d\S*)\.tar\.gz
+
+https://github.com/OpenSIPS/python-opensips/releases /OpenSIPS/python-opensips/archive/(.+)\.tar\.gz

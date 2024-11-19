@@ -1,3 +1,5 @@
 build/
 opensips.egg-info/
 __pycache__/
+/debian
+.pybuild/
