@@ -36,7 +36,7 @@ Module, Registrar and User Location, Load Balaning/Dispatching/LCR,
 XMLRPC Interface.
 
 %prep
-%autosetup -n %{name}
+%autosetup -n %{name}-%{version}
 
 %build
 %py3_build
