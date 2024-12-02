@@ -34,7 +34,8 @@ class Datagram(Connection):
 
         if "datagram_port" not in kwargs:
             raise ValueError("datagram_port is required for Datagram")
-
+        
+        self.timeout = kwargs.get("timeout", 1)
         self.ip = kwargs["datagram_ip"]
         self.port = int(kwargs["datagram_port"])
 
@@ -44,7 +45,7 @@ class Datagram(Connection):
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             udp_socket.sendto(jsoncmd.encode(), (self.ip, self.port))
-            udp_socket.settimeout(5.0)
+            udp_socket.settimeout(self.timeout)
             reply = udp_socket.recv(32768)
         except Exception as e:
             raise jsonrpc_helper.JSONRPCException(e)
