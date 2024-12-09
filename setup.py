@@ -48,13 +48,13 @@ setup(
             'opensips-event = opensips.event.__main__:main',
         ],
     },
-    data_files=[
-        ("share/bash_completion/completions/",
-         ["utils/completion/python-opensips"])
-    ],
-    package_data={
-        "": ["utils/completion/python-opensips"]
-    },
-    include_package_data=True,
+#    data_files=[
+#        ("share/bash_completion/completions/",
+#         ["utils/completion/python-opensips"])
+#    ],
+#    package_data={
+#        "": ["utils/completion/python-opensips"]
+#    },
+#    include_package_data=True,
     python_requires=">=3.6"
 )
