@@ -135,12 +135,10 @@ def main():
             sys.exit(1)
 
     if args.stats:
-        print('Using get_statistics! Be careful not to use '
-              'command after -s/--stats.')
         args.command = 'get_statistics'
 
         if args.json:
-            print('Cannot use -s/--stats with -j/--json!')
+            print('ERROR: cannot use -s/--stats with -j/--json!')
             sys.exit(1)
 
         args.parameters = {'statistics': args.stats}
@@ -148,16 +146,15 @@ def main():
         if args.json:
             try:
                 args.parameters = json.loads(args.json)
-                print(args.parameters)
             except json.JSONDecodeError as e:
-                print('Invalid JSON: ', e)
+                print('ERROR: invalid JSON: ', e)
                 sys.exit(1)
 
     try:
         response = mi.execute(args.command, args.parameters)
         print(json.dumps(response, indent=4))
     except OpenSIPSMIException as e:
-        print('Error: ', e)
+        print('ERROR: ', e)
         sys.exit(1)
 
 

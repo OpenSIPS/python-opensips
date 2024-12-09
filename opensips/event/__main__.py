@@ -112,7 +112,7 @@ def main():
                         timeout=0.1)
     else:
         if not args.bash_complete:
-            print(f'Unknown type: {args.type}')
+            print(f'ERROR: unknown type: {args.type}')
         sys.exit(1)
 
     if args.bash_complete is not None:
@@ -144,7 +144,7 @@ def main():
             sys.exit(1)
 
     if args.event is None:
-        print('Event name is required')
+        print(f'ERROR: unknown type: {args.type}')
         sys.exit(1)
 
     hdl = OpenSIPSEventHandler(mi, args.transport,
@@ -160,7 +160,7 @@ def main():
         try:
             print(json.dumps(message, indent=4))
         except json.JSONDecodeError as e:
-            print(f"Failed to decode JSON: {e}")
+            print(f"ERROR: failed to decode JSON: {e}")
 
     ev = None
 
@@ -179,7 +179,7 @@ def main():
     try:
         ev = hdl.subscribe(args.event, event_handler, args.expire)
     except OpenSIPSEventException as e:
-        print(e)
+        print("ERROR:", e)
         sys.exit(1)
 
     while True:
