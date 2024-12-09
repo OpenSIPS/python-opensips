@@ -42,11 +42,19 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
     ],
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'opensips-mi = opensips.mi.__main__:main',
             'opensips-event = opensips.event.__main__:main',
         ],
     },
+    data_files=[
+        ("share/bash_completion/completions/",
+         ["utils/completion/python-opensips"])
+    ],
+    package_data={
+        "": ["utils/completion/python-opensips"]
+    },
+    include_package_data=True,
     python_requires=">=3.6"
 )
