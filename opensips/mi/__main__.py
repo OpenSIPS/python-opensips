@@ -63,6 +63,12 @@ group.add_argument('command',
                    type=str,
                    help='command')
 
+group.add_argument('-bc', '--bash-complete',
+                    type=str,
+                    nargs='?',
+                    const='',
+                    help='Provide options for bash completion')
+
 group = parser.add_mutually_exclusive_group(required=False)
 
 group.add_argument('-j', '--json',
@@ -79,6 +85,54 @@ group.add_argument('parameters',
 def main():
     """ Main function of the opensips-mi script """
     args = parser.parse_args()
+
+    if args.type == 'fifo':
+        fifo_args = {}
+        if args.fifo_file:
+            fifo_args['fifo_file'] = args.fifo_file
+        if args.fifo_fallback:
+            fifo_args['fifo_file_fallback'] = args.fifo_fallback
+        if args.fifo_reply_dir:
+            fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
+        mi = OpenSIPSMI('fifo', **fifo_args)
+    elif args.type == 'http':
+        mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
+    elif args.type == 'datagram':
+        mi = OpenSIPSMI('datagram',
+                        datagram_ip=args.ip,
+                        datagram_port=args.port,
+                        timeout=0.1)
+    else:
+        if not args.bash_complete:
+            print(f'Unknown type: {args.type}')
+        sys.exit(1)
+
+
+    if args.bash_complete is not None:
+        if args.bash_complete != '':
+            if len(args.bash_complete) > 1:
+                last_arg = '--' + args.bash_complete
+            else:
+                last_arg = '-' + args.bash_complete
+            
+            for action in parser._actions:
+                if last_arg in action.option_strings:
+                    if action.choices:
+                        print(' '.join(action.choices))
+                    break
+            sys.exit(0)
+        else:
+            options = []
+            for action in parser._actions:
+                for opt in action.option_strings:
+                    options.append(opt)
+            print(' '.join(options))
+        try:
+            response = mi.execute('which', [])
+            print(" ".join(response))
+            sys.exit(0)
+        except Exception as e:
+            sys.exit(1)
 
     if args.stats:
         print('Using get_statistics! Be careful not to use '
@@ -98,25 +152,6 @@ def main():
             except json.JSONDecodeError as e:
                 print('Invalid JSON: ', e)
                 sys.exit(1)
-
-    if args.type == 'fifo':
-        fifo_args = {}
-        if args.fifo_file:
-            fifo_args['fifo_file'] = args.fifo_file
-        if args.fifo_fallback:
-            fifo_args['fifo_file_fallback'] = args.fifo_fallback
-        if args.fifo_reply_dir:
-            fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
-        mi = OpenSIPSMI('fifo', **fifo_args)
-    elif args.type == 'http':
-        mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
-    elif args.type == 'datagram':
-        mi = OpenSIPSMI('datagram',
-                        datagram_ip=args.ip,
-                        datagram_port=args.port)
-    else:
-        print(f'Unknownt type: {args.type}')
-        sys.exit(1)
 
     try:
         response = mi.execute(args.command, args.parameters)
