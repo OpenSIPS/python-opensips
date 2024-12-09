@@ -43,8 +43,7 @@ XMLRPC Interface.
 
 %install
 %py3_install
-install -d %{buildroot}%{bash_completions_dir}
-install -Dpm 0644 utils/completion/python-opensips -t %{buildroot}%{bash_completions_dir}/python-opensips
+install -Dpm 0644 utils/completion/python-opensips -t %{buildroot}%{bash_completions_dir}/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
