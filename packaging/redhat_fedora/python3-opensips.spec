@@ -43,7 +43,7 @@ XMLRPC Interface.
 
 %install
 %py3_install
-install -Dpm 0644 utils/completion/python-opensips -t %{buildroot}%{bash_completions_dir}
+install -Dpm 0644 utils/completion/python-opensips -t %{buildroot}%{bash_completions_dir}/python-opensips
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -53,10 +53,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/opensips-mi
 %{python3_sitelib}/opensips/*
 %{python3_sitelib}/opensips-*.egg-info
+%{bash_completions_dir}/python-opensips
 %doc README.md
 %doc docs/*
 %license LICENSE
-%{bash_completions_dir}/python-opensips
 
 %changelog
 * Mon Dec 09 2024 Razvan Crainea <razvan@opensips.org> - 0.1.4-1
