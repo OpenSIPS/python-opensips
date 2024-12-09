@@ -57,10 +57,17 @@ communication.add_argument('-fd', '--fifo-reply-dir',
                            type=str,
                            help='OpenSIPS MI FIFO Reply Directory')
 
+parser.add_argument('-bc', '--bash-complete',
+                    type=str,
+                    nargs='?',
+                    const='',
+                    help='Provide options for bash completion')
+
 event = parser.add_argument_group('event')
 
 event.add_argument('event',
                    type=str,
+                   nargs='?',
                    help='OpenSIPS Event Name')
 
 event.add_argument('-T', '--transport',
@@ -101,9 +108,43 @@ def main():
     elif args.type == 'datagram':
         mi = OpenSIPSMI('datagram',
                         datagram_ip=args.ip,
-                        datagram_port=args.port)
+                        datagram_port=args.port,
+                        timeout=0.1)
     else:
-        print(f'Unknown type: {args.type}')
+        if not args.bash_complete:
+            print(f'Unknown type: {args.type}')
+        sys.exit(1)
+
+    if args.bash_complete is not None:
+        if args.bash_complete != '':
+            if len(args.bash_complete) > 1:
+                last_arg = '--' + args.bash_complete
+            else:
+                last_arg = '-' + args.bash_complete
+            
+            for action in parser._actions:
+                if last_arg in action.option_strings:
+                    if action.choices:
+                        print(' '.join(action.choices))
+                    break
+            sys.exit(0)
+        else:
+            options = []
+            for action in parser._actions:
+                for opt in action.option_strings:
+                    options.append(opt)
+            print(' '.join(options))
+        try:
+            response = mi.execute('events_list', [])
+            events = response.get("Events", [])
+            event_names = [event["name"] for event in events]
+            print(' '.join(event_names))
+            sys.exit(0)
+        except Exception as e:
+            sys.exit(1)
+
+    if args.event is None:
+        print('Event name is required')
         sys.exit(1)
 
     hdl = OpenSIPSEventHandler(mi, args.transport,
