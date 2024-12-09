@@ -1,6 +1,6 @@
 Summary:  A collection of Python packages for OpenSIPS.
 Name:     python3-opensips
-Version:  0.1.3
+Version:  0.1.4
 Release:  1%{?dist}
 License:  GPL-3+
 Group:    System Environment/Daemons
@@ -59,5 +59,9 @@ rm -rf $RPM_BUILD_ROOT
 %{bash_completions_dir}/python-opensips
 
 %changelog
+* Mon Dec 09 2024 Razvan Crainea <razvan@opensips.org> - 0.1.4-1
+- Fix logging of mi script
+- Add completion
+
 * Tue Nov 19 2024 Razvan Crainea <razvan@opensips.org> - 0.1.3-3
 - Initial spec.
