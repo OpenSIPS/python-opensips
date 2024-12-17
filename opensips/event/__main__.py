@@ -24,26 +24,40 @@ import json
 import time
 import signal
 import argparse
+import os
 from opensips.mi import OpenSIPSMI
 from opensips.event import OpenSIPSEventHandler, OpenSIPSEventException
 
+
+def load_env_file(env_file_path):
+    if not os.path.isfile(env_file_path):
+        return
+    with open(env_file_path) as f:
+        for line in f:
+            if line.startswith('#') or not line.strip():
+                continue
+            key, value = line.strip().split('=', 1)
+            os.environ[key] = value
+
 parser = argparse.ArgumentParser()
+
+parser.add_argument('--env-file',
+                    type=str,
+                    default='.env',
+                    help='Load environment variables from file')
 
 communication = parser.add_argument_group('communication')
 
 communication.add_argument('-t', '--type',
                            type=str,
-                           default='fifo',
                            choices=['fifo', 'http', 'datagram'],
                            help='OpenSIPS MI Communication Type')
 communication.add_argument('-i', '--ip',
                            type=str,
-                           help='OpenSIPS MI IP Address',
-                           default='127.0.0.1')
+                           help='OpenSIPS MI IP Address')
 communication.add_argument('-p', '--port',
                            type=int,
-                           help='OpenSIPS MI Port',
-                           default=8888)
+                           help='OpenSIPS MI Port')
 communication.add_argument('-f', '--fifo-file',
                            metavar='FIFO_FILE',
                            type=str,
@@ -94,14 +108,27 @@ def main():
 
     args = parser.parse_args()
 
+    load_env_file(args.env_file)
+
+    if not args.type:
+        args.type = os.getenv('OPENSIPS_MI_TYPE', 'datagram')
+    if not args.ip:
+        args.ip = os.getenv('OPENSIPS_MI_IP', '127.0.0.1')
+    if not args.port:
+        args.port = os.getenv('OPENSIPS_MI_PORT', 8080)
+    if not args.fifo_file:
+        args.fifo_file = os.getenv('OPENSIPS_MI_FIFO_FILE', '/tmp/opensips_fifo')
+    if not args.fifo_fallback:
+        args.fifo_fallback = os.getenv('OPENSIPS_MI_FIFO_FALLBACK', '/tmp/opensips_fifo_fallback')
+    if not args.fifo_reply_dir:
+        args.fifo_reply_dir = os.getenv('OPENSIPS_MI_FIFO_REPLY_DIR', '/tmp/opensips_fifo_reply')
+
     if args.type == 'fifo':
-        fifo_args = {}
-        if args.fifo_file:
-            fifo_args['fifo_file'] = args.fifo_file
-        if args.fifo_fallback:
-            fifo_args['fifo_file_fallback'] = args.fifo_fallback
-        if args.fifo_reply_dir:
-            fifo_args['fifo_reply_dir'] = args.fifo_reply_dir
+        fifo_args = {
+            'fifo_file': args.fifo_file,
+            'fifo_file_fallback': args.fifo_fallback,
+            'fifo_reply_dir': args.fifo_reply_dir,
+        }
         mi = OpenSIPSMI('fifo', **fifo_args)
     elif args.type == 'http':
         mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
