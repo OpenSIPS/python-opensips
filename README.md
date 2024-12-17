@@ -77,6 +77,7 @@ After installing the package, you can use the provided [opensips-mi](opensips/mi
 - `-f` or `--fifo-file` - the path to the FIFO file.
 - `-fb` or `--fifo-fallback` - the path to the FIFO fallback file.
 - `-fd` or `--fifo-reply-dir` - the directory where the FIFO reply files are stored.
+- `--env-file` - the path to the environment file that contains the MI parameters (by default, the script will look for the `.env` file in the current directory); lower priority than the command line arguments.
 
 #### Usage
 ```bash
@@ -98,6 +99,7 @@ You can use the provided [opensips-event](opensips/event/__main__.py) script to 
 - `-lp` or `--listen-port` - the port to listen on.
 - `-e` or `--expire` - the expiration time for the subscription.
 - the event name to subscribe for.
+- `--env-file` - the path to the environment file that contains the MI parameters (by default, the script will look for the `.env` file in the current directory); lower priority than the command line arguments.
 
 #### Usage
 ```bash
