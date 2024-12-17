@@ -60,7 +60,7 @@ communication.add_argument('-fd', '--fifo-reply-dir',
 parser.add_argument('-bc', '--bash-complete',
                     type=str,
                     nargs='?',
-                    const='',
+                    const='events',
                     help='Provide options for bash completion')
 
 event = parser.add_argument_group('event')
@@ -116,11 +116,8 @@ def main():
         sys.exit(1)
 
     if args.bash_complete is not None:
-        if args.bash_complete != '':
-            if len(args.bash_complete) > 1:
-                last_arg = '--' + args.bash_complete
-            else:
-                last_arg = '-' + args.bash_complete
+        if args.bash_complete not in ['params', 'events']:
+            last_arg = '--' + args.bash_complete if len(args.bash_complete) > 1 else '-' + args.bash_complete
             
             for action in parser._actions:
                 if last_arg in action.option_strings:
@@ -128,12 +125,16 @@ def main():
                         print(' '.join(action.choices))
                     break
             sys.exit(0)
-        else:
+
+        if args.bash_complete == 'params':
             options = []
             for action in parser._actions:
                 for opt in action.option_strings:
                     options.append(opt)
             print(' '.join(options))
+            sys.exit(0)
+
+        # if args.bash_complete == 'events':
         try:
             response = mi.execute('events_list', [])
             events = response.get("Events", [])
@@ -141,7 +142,12 @@ def main():
             print(' '.join(event_names))
             sys.exit(0)
         except Exception as e:
-            sys.exit(1)
+            options = []
+            for action in parser._actions:
+                for opt in action.option_strings:
+                    options.append(opt)
+            print(' '.join(options))
+            sys.exit(0)
 
     if args.event is None:
         print(f'ERROR: unknown type: {args.type}')

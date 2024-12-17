@@ -14,7 +14,12 @@ function _opensips-complete() {
                 completed_args="$completed_args $prev"
             fi
         fi
-        opts="$($1 $completed_args -bc)"
+
+        if [[ "${cur:0:1}" == "-" ]]; then
+            opts="$($1 $completed_args -bc params)"
+        else
+            opts="$($1 $completed_args -bc)"
+        fi
     else
         while [[ "${prev:0:1}" == "-" ]]; do
             prev="${prev:1}"

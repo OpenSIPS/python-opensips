@@ -66,7 +66,7 @@ group.add_argument('command',
 group.add_argument('-bc', '--bash-complete',
                     type=str,
                     nargs='?',
-                    const='',
+                    const='commands',
                     help='Provide options for bash completion')
 
 group = parser.add_mutually_exclusive_group(required=False)
@@ -109,11 +109,8 @@ def main():
 
 
     if args.bash_complete is not None:
-        if args.bash_complete != '':
-            if len(args.bash_complete) > 1:
-                last_arg = '--' + args.bash_complete
-            else:
-                last_arg = '-' + args.bash_complete
+        if args.bash_complete not in ['params', 'commands']:
+            last_arg = '--' + args.bash_complete if len(args.bash_complete) > 1 else '-' + args.bash_complete
             
             for action in parser._actions:
                 if last_arg in action.option_strings:
@@ -121,18 +118,27 @@ def main():
                         print(' '.join(action.choices))
                     break
             sys.exit(0)
-        else:
+
+        if args.bash_complete == 'params':
             options = []
             for action in parser._actions:
                 for opt in action.option_strings:
                     options.append(opt)
             print(' '.join(options))
+            sys.exit(0)
+
+        # if args.bash_complete == 'commands':
         try:
             response = mi.execute('which', [])
             print(" ".join(response))
             sys.exit(0)
         except Exception as e:
-            sys.exit(1)
+            options = []
+            for action in parser._actions:
+                for opt in action.option_strings:
+                    options.append(opt)
+            print(' '.join(options))
+            sys.exit(0)
 
     if args.stats:
         args.command = 'get_statistics'
