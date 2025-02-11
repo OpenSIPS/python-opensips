@@ -106,17 +106,17 @@ def main():
     load_env_file(args.env_file)
 
     if not args.type:
-        args.type = os.getenv('OPENSIPS_MI_TYPE', 'datagram')
+        args.type = os.getenv('OPENSIPS_MI_TYPE', 'fifo')
     if not args.ip:
         args.ip = os.getenv('OPENSIPS_MI_IP', '127.0.0.1')
     if not args.port:
         args.port = os.getenv('OPENSIPS_MI_PORT', 8080)
     if not args.fifo_file:
-        args.fifo_file = os.getenv('OPENSIPS_MI_FIFO_FILE', '/tmp/opensips_fifo')
+        args.fifo_file = os.getenv('OPENSIPS_MI_FIFO_FILE', '/var/run/opensips/opensips_fifo')
     if not args.fifo_fallback:
-        args.fifo_fallback = os.getenv('OPENSIPS_MI_FIFO_FALLBACK', '/tmp/opensips_fifo_fallback')
+        args.fifo_fallback = os.getenv('OPENSIPS_MI_FIFO_FALLBACK', '/tmp/opensips_fifo')
     if not args.fifo_reply_dir:
-        args.fifo_reply_dir = os.getenv('OPENSIPS_MI_FIFO_REPLY_DIR', '/tmp/opensips_fifo_reply')
+        args.fifo_reply_dir = os.getenv('OPENSIPS_MI_FIFO_REPLY_DIR', '/tmp/')
 
     if args.type == 'fifo':
         fifo_args = {
