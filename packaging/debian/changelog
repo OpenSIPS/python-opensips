@@ -1,3 +1,9 @@
+python3-opensips (0.1.5-3) stable; urgency=low
+
+  * Add bash-completion in rules
+
+ -- Razvan Crainea <razvan@opensips.org>  Tue, 11 Feb 2024 16:10:00 +0300
+
 python3-opensips (0.1.5-2) stable; urgency=low
 
   * Fix name of bash-completrion
