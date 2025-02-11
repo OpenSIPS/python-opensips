@@ -1,3 +1,9 @@
+python3-opensips (0.1.5-1) stable; urgency=low
+
+  * Minor Public Release.
+
+ -- Darius Stefan <darius.stefan@opensips.org>  Tue, 11 Feb 2024 14:30:00 +0300
+
 python3-opensips (0.1.4-1) stable; urgency=low
 
   * Minor Public Release.

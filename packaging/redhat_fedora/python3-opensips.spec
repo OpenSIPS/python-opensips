@@ -1,6 +1,6 @@
 Summary:  A collection of Python packages for OpenSIPS.
 Name:     python3-opensips
-Version:  0.1.4
+Version:  0.1.5
 Release:  1%{?dist}
 License:  GPL-3+
 Group:    System Environment/Daemons
@@ -60,6 +60,10 @@ rm -rf $RPM_BUILD_ROOT
 %license LICENSE
 
 %changelog
+* Tue Feb 11 2025 Darius Stefan <darius.stefan@opensips.org> - 0.1.5-1
+- Set default communication type to fifo
+- Set correct default values for fifo communication
+
 * Mon Dec 09 2024 Razvan Crainea <razvan@opensips.org> - 0.1.4-1
 - Fix logging of mi script
 - Add completion
