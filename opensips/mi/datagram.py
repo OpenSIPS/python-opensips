@@ -32,18 +32,17 @@ class Datagram(Connection):
         if "datagram_unix_socket" in kwargs:
             self.address = kwargs["datagram_unix_socket"]
             self.family = socket.AF_UNIX
-            self.recv_size = 65535 * 32
             with NamedTemporaryFile(prefix="opensips_mi_reply_", dir="/tmp") as nt:
                 self.recv_sock = nt.name
         elif "datagram_ip" in kwargs and "datagram_port" in kwargs:
             self.address = (kwargs["datagram_ip"], int(kwargs["datagram_port"]))
             self.family = socket.AF_INET
-            self.recv_size = 32768
             self.recv_sock = None
         else:
             raise ValueError("Either datagram_unix_socket or both datagram_ip and datagram_port are required for Datagram")
 
-        self.timeout = kwargs.get("timeout", 1)
+        self.timeout = float(kwargs.get("datagram_timeout") or 0.1)
+        self.recv_size = int(kwargs.get("datagram_buffer_size") or 32768)
 
     def execute(self, method: str, params: dict):
         jsoncmd = jsonrpc_helper.get_command(method, params)
