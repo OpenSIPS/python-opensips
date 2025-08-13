@@ -67,6 +67,10 @@ communication.add_argument('-fd', '--fifo-reply-dir',
                            metavar='FIFO_DIR',
                            type=str,
                            help='OpenSIPS MI FIFO Reply Directory')
+communication.add_argument('-ds', '--datagram-socket',
+                           metavar='SOCK',
+                           type=str,
+                           help='OpenSIPS Datagram Socket')
 
 group = parser.add_mutually_exclusive_group(required=True)
 
@@ -128,10 +132,15 @@ def main():
     elif args.type == 'http':
         mi = OpenSIPSMI('http', url=f'http://{args.ip}:{args.port}/mi')
     elif args.type == 'datagram':
-        mi = OpenSIPSMI('datagram',
-                        datagram_ip=args.ip,
-                        datagram_port=args.port,
-                        timeout=0.1)
+        if args.datagram_socket:
+            mi = OpenSIPSMI('datagram',
+                            datagram_unix_socket=args.datagram_socket,
+                            timeout=0.1)
+        else:
+            mi = OpenSIPSMI('datagram',
+                            datagram_ip=args.ip,
+                            datagram_port=args.port,
+                            timeout=0.1)
     else:
         if not args.bash_complete:
             print(f'Unknown type: {args.type}')

@@ -20,37 +20,48 @@
 """ MI Datagram implementation """
 
 import socket
+import os
+from tempfile import NamedTemporaryFile
 from .connection import Connection
 from . import jsonrpc_helper
 
-
 class Datagram(Connection):
-
     """ MI Datagram connection """
 
     def __init__(self, **kwargs):
-        if "datagram_ip" not in kwargs:
-            raise ValueError("datagram_ip is required for Datagram")
+        if "datagram_unix_socket" in kwargs:
+            self.address = kwargs["datagram_unix_socket"]
+            self.family = socket.AF_UNIX
+            self.recv_size = 65535 * 32
+            with NamedTemporaryFile(prefix="opensips_mi_reply_", dir="/tmp") as nt:
+                self.recv_sock = nt.name
+        elif "datagram_ip" in kwargs and "datagram_port" in kwargs:
+            self.address = (kwargs["datagram_ip"], int(kwargs["datagram_port"]))
+            self.family = socket.AF_INET
+            self.recv_size = 32768
+            self.recv_sock = None
+        else:
+            raise ValueError("Either datagram_unix_socket or both datagram_ip and datagram_port are required for Datagram")
 
-        if "datagram_port" not in kwargs:
-            raise ValueError("datagram_port is required for Datagram")
-        
         self.timeout = kwargs.get("timeout", 1)
-        self.ip = kwargs["datagram_ip"]
-        self.port = int(kwargs["datagram_port"])
 
     def execute(self, method: str, params: dict):
         jsoncmd = jsonrpc_helper.get_command(method, params)
 
-        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        udp_socket = socket.socket(self.family, socket.SOCK_DGRAM)
         try:
-            udp_socket.sendto(jsoncmd.encode(), (self.ip, self.port))
+            if self.recv_sock:
+                udp_socket.bind(self.recv_sock)
+            udp_socket.sendto(jsoncmd.encode(), self.address)
             udp_socket.settimeout(self.timeout)
-            reply = udp_socket.recv(32768)
+            reply = udp_socket.recv(self.recv_size)
         except Exception as e:
             raise jsonrpc_helper.JSONRPCException(e)
         finally:
+            if self.recv_sock:
+                os.unlink(self.recv_sock)
             udp_socket.close()
+
         return jsonrpc_helper.get_reply(reply)
 
     def valid(self):
