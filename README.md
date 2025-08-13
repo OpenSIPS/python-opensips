@@ -78,6 +78,9 @@ After installing the package, you can use the provided [opensips-mi](opensips/mi
 - `-fb` or `--fifo-fallback` - the path to the FIFO fallback file.
 - `-fd` or `--fifo-reply-dir` - the directory where the FIFO reply files are stored.
 - `--env-file` - the path to the environment file that contains the MI parameters (by default, the script will look for the `.env` file in the current directory); lower priority than the command line arguments.
+- `-ds` or `--datagram-socket` - Unix Datagram Socket.
+- `-dt` or `--datagram-timeout` - Datagram Socket timeout in seconds. Default is 0.1.
+- `-db` or `--datagram-buffer-size` - Datagram Socket buffer size in bytes. Default is 32768.
 
 #### Usage
 ```bash

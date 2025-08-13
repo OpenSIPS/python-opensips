@@ -70,7 +70,13 @@ communication.add_argument('-fd', '--fifo-reply-dir',
 communication.add_argument('-ds', '--datagram-socket',
                            metavar='SOCK',
                            type=str,
-                           help='OpenSIPS Datagram Socket')
+                           help='OpenSIPS Unix Datagram Socket')
+communication.add_argument('-dt', '--datagram-timeout',
+                           type=int,
+                           help='OpenSIPS Datagram Socket Timeout')
+communication.add_argument('-db', '--datagram-buffer-size',
+                           type=int,
+                           help='OpenSIPS Datagram Socket Buffer Size')
 
 group = parser.add_mutually_exclusive_group(required=True)
 
@@ -135,12 +141,14 @@ def main():
         if args.datagram_socket:
             mi = OpenSIPSMI('datagram',
                             datagram_unix_socket=args.datagram_socket,
-                            timeout=0.1)
+                            datagram_timeout=args.datagram_timeout,
+                            datagram_buffer_size=args.datagram_buffer_size)
         else:
             mi = OpenSIPSMI('datagram',
                             datagram_ip=args.ip,
                             datagram_port=args.port,
-                            timeout=0.1)
+                            datagram_timeout=args.datagram_timeout,
+                            datagram_buffer_size=args.datagram_buffer_size)
     else:
         if not args.bash_complete:
             print(f'Unknown type: {args.type}')
