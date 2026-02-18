@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM python:slim-trixie
 LABEL maintainer="Darius Stefan <darius.stefan@opensips.org>"
 
 RUN pip install opensips

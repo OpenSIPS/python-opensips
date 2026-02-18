@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling>=1.4"]
+build-backend = "hatchling.build"
+
+[project]
+name = "opensips"
+dynamic = ["version"]
+authors = [
+  { name = "Darius Stefan", email = "darius.stefan@opensips.org" },
+]
+description = "OpenSIPS Python Packages"
+readme = "README.md"
+requires-python = ">=3.6"
+license = "GPL-3.0-or-later"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/OpenSIPS/python-opensips"
+Repository = "https://github.com/OpenSIPS/python-opensips"
+
+[project.scripts]
+opensips-mi = "opensips.mi.__main__:main"
+opensips-event = "opensips.event.__main__:main"
+
+[tool.hatch.version]
+path = "opensips/version.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["opensips"]

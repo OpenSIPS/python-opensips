@@ -1,4 +1,4 @@
-NAME ?= pyhton-opensips
+NAME ?= python-opensips
 OPENSIPS_DOCKER_TAG ?= latest
 
 all: build

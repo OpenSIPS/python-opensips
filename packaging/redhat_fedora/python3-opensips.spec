@@ -1,6 +1,6 @@
 Summary:  A collection of Python packages for OpenSIPS.
 Name:     python3-opensips
-Version:  0.1.5
+Version:  0.1.8
 Release:  1%{?dist}
 License:  GPL-3+
 Group:    System Environment/Daemons
@@ -9,7 +9,9 @@ URL:      https://github.com/OpenSIPS/python-opensips
 
 BuildArch: noarch
 
-BuildRequires:  python%{python3_pkgversion}-setuptools, python%{python3_pkgversion}-devel
+BuildRequires:  pyproject-rpm-macros
+BuildRequires:  python%{python3_pkgversion}-devel
+BuildRequires:  python%{python3_pkgversion}dist(hatchling)
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 AutoReqProv: no
@@ -39,10 +41,10 @@ XMLRPC Interface.
 %autosetup -n %{name}-%{version}
 
 %build
-%py3_build
+%pyproject_wheel
 
 %install
-%py3_install
+%pyproject_install
 install -d %{buildroot}%{bash_completions_dir}/
 install -Dpm 0644 utils/completion/python-opensips -t %{buildroot}%{bash_completions_dir}/
 
@@ -53,7 +55,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/opensips-event
 %{_bindir}/opensips-mi
 %{python3_sitelib}/opensips/*
-%{python3_sitelib}/opensips-*.egg-info
+%{python3_sitelib}/opensips-*.dist-info
 %{bash_completions_dir}/python-opensips
 %doc README.md
 %doc docs/*
