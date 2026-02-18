@@ -14,7 +14,7 @@ Currently, the following packages are available:
     
     ```bash
     git clone
-    cd python-opebsips
+    cd python-opensips
     pip install .
     ```
 
@@ -113,13 +113,13 @@ opensips-event -t datagram -p 8080 -T datagram -lp 50012 -e 3600 E_PIKE_BLOCKED
 
 <!-- License source -->
 [License-GPLv3]: https://www.gnu.org/licenses/gpl-3.0.en.html "GNU GPLv3"
-[Logo-CC_BY]: https://i.creativecommons.org/l/by/4.0/88x31.png "Creative Common Logo"
-[License-CC_BY]: https://creativecommons.org/licenses/by/4.0/legalcode "Creative Common License"
+[Logo-CC_BY]: https://i.creativecommons.org/l/by/4.0/88x31.png "Creative Commons Logo"
+[License-CC_BY]: https://creativecommons.org/licenses/by/4.0/legalcode "Creative Commons License"
 
 The `python-opensips` source code is licensed under the [GNU General Public License v3.0][License-GPLv3]
 
-All documentation files (i.e. `.md` extension) are licensed under the [Creative Common License 4.0][License-CC_BY]
+All documentation files (i.e. `.md` extension) are licensed under the [Creative Commons License 4.0][License-CC_BY]
 
-![Creative Common Logo][Logo-CC_BY]
+![Creative Commons Logo][Logo-CC_BY]
 
 © 2024 - OpenSIPS Solutions

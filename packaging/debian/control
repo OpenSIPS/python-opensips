@@ -15,7 +15,7 @@ Description:  A collection of Python packages for OpenSIPS.
  simple interface for interacting with OpenSIPS.
  .
  OpenSIPS is a very fast and flexible SIP (RFC3261)
- server. Written entirely in C, OpenSIPS can handle thousands calls
+ server. Written entirely in C, OpenSIPS can handle thousands of calls
  per second even on low-budget hardware.
  .
  C Shell-like scripting language provides full control over the server's

@@ -4,7 +4,7 @@ Version:  0.1.8
 Release:  1%{?dist}
 License:  GPL-3+
 Group:    System Environment/Daemons
-Source0:  Source0:  http://download.opensips.org/python/%{name}-%{version}.tar.gz
+Source0:  http://download.opensips.org/python/%{name}-%{version}.tar.gz
 URL:      https://github.com/OpenSIPS/python-opensips
 
 BuildArch: noarch
@@ -24,7 +24,7 @@ These modules are designed to be as lightweight as possible and provide a
 simple interface for interacting with OpenSIPS.
 .
 OpenSIPS is a very fast and flexible SIP (RFC3261)
-server. Written entirely in C, OpenSIPS can handle thousands calls
+server. Written entirely in C, OpenSIPS can handle thousands of calls
 per second even on low-budget hardware.
 .
 C Shell-like scripting language provides full control over the server's
@@ -34,7 +34,7 @@ loaded.
 Among others, the following modules are available: Digest Authentication, CPL
 scripts, Instant Messaging, MySQL support, Presence Agent, Radius
 Authentication, Record Routing, SMS Gateway, Jabber/XMPP Gateway, Transaction
-Module, Registrar and User Location, Load Balaning/Dispatching/LCR,
+Module, Registrar and User Location, Load Balancing/Dispatching/LCR,
 XMLRPC Interface.
 
 %prep

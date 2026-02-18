@@ -18,7 +18,7 @@ The container receives parameters in the following format:
 CMD [PARAMS]*
 ```
 
-Meaning of the parameters is as it follows:
+The meaning of the parameters is as follows:
 * `CMD` - the command used to run; if the `CMD` ends with `.sh` extension, it
 will be run as a bash script, if the `CMD` ends with `.py` extension, it is
 run as a python script, otherwise it is run as a `opensips-mi` command
