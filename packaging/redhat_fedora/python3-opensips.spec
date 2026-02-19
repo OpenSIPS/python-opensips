@@ -9,9 +9,8 @@ URL:      https://github.com/OpenSIPS/python-opensips
 
 BuildArch: noarch
 
-BuildRequires:  pyproject-rpm-macros
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}dist(hatchling)
+BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 AutoReqProv: no
@@ -41,10 +40,10 @@ XMLRPC Interface.
 %autosetup -n %{name}-%{version}
 
 %build
-%pyproject_wheel
+%py3_build
 
 %install
-%pyproject_install
+%py3_install
 install -d %{buildroot}%{bash_completions_dir}/
 install -Dpm 0644 utils/completion/python-opensips -t %{buildroot}%{bash_completions_dir}/
 
@@ -55,13 +54,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/opensips-event
 %{_bindir}/opensips-mi
 %{python3_sitelib}/opensips/*
-%{python3_sitelib}/opensips-*.dist-info
+%{python3_sitelib}/opensips-*.egg-info
 %{bash_completions_dir}/python-opensips
 %doc README.md
 %doc docs/*
 %license LICENSE
 
 %changelog
+* Thu Feb 19 2026 Razvan Crainea <razvan@opensips.org> - 0.1.8-1
+- Use setuptools-based RPM build macros for EL compatibility
+
 * Tue Feb 11 2025 Darius Stefan <darius.stefan@opensips.org> - 0.1.5-1
 - Set default communication type to fifo
 - Set correct default values for fifo communication
