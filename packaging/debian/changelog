@@ -1,3 +1,10 @@
+python3-opensips (0.1.9-1) stable; urgency=low
+
+  * Bump upstream version to 0.1.9.
+  * Switch build backend to hatchling (PEP 517/pyproject).
+
+ -- Razvan Crainea <razvan@opensips.org>  Thu, 19 Feb 2026 12:08:05 +0200
+
 python3-opensips (0.1.5-3) stable; urgency=low
 
   * Add bash-completion in rules

@@ -1,6 +1,6 @@
 Summary:  A collection of Python packages for OpenSIPS.
 Name:     python3-opensips
-Version:  0.1.8
+Version:  0.1.9
 Release:  1%{?dist}
 License:  GPL-3+
 Group:    System Environment/Daemons
